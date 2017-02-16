@@ -1,5 +1,3 @@
-var transaction;
-
 Date.prototype.toYMD = Date_toYMD;
 function Date_toYMD() {
 	var year = String(this.getFullYear()),
@@ -216,7 +214,6 @@ $(function() {
 			var escrow_expiration = new Date(response.time);
 			escrow_expiration.setHours(escrow_expiration.getHours() + parseInt($('#sendEscrowExpiration').val()));			
 			
-			//console.log(response.time, wif, from, to, agent, escrow_id, sbd_amount, steem_amount, fee, ratification_deadline.toYMD(), escrow_expiration.toYMD());
 			steem.broadcast.escrowTransfer(
 				wif, // active key
 				from,
@@ -230,19 +227,23 @@ $(function() {
 				escrow_expiration.toYMD(),
 				JSON.stringify(meta),
 				function(err, response) {
-					if(!err) {		
+					if(!err && response.ref_block_num) {
 						if(from) {
 							localStorage.setItem('escrow_login', from);
 						}
+						$('#sendError').slideUp();
 						$('#step1').slideUp();
 						$('#step2').slideDown();
 						$('.sentLink').html('<a href="?id=' + from + '-' + escrow_id + '">https://golosim.ru/escrow/?id=' + from + '-' + escrow_id + '</a>');
 						$('.sentId').html(from + '-' + escrow_id);
 					} else {
-						$('#sendError').html('<br><b>Возникла ошибка:</b><br><br>' + err.payload.error.message.replace(/([^>])\n/g, '$1<br><br>'));
-						console.log(err, response);
+						$('#sendError').html(
+							'<br><b>Возникла ошибка:</b><br><br>' +
+							err.payload.error.message.replace(/([^>])\n/g, '$1<br><br>')
+						);
 						btn.prop('disabled', false);
 					}
+					console.log(err, response);
 				}
 			);
 		});
@@ -323,7 +324,9 @@ $(function() {
 		$('#sendLogin').val(localStorage.getItem('escrow_login'));
 	}
 		
-	var id = gup('id');		
+	var transaction,
+	id = gup('id');		
+	
 	if(id) {
 		transaction = new Transaction(gup('id'), function(transaction) {
 			$('div.' + transaction.status).show();
