@@ -177,14 +177,7 @@ $(function() {
 		return false;
 	});
 
-	$('#sendAgent').change(function() {
-		var agent = $('#sendAgent').val();
-		$('#sendFeeAmoutLabel').html('Комиссия от <a href="https://golos.io/@' + agent + '" target="_blank">@' + agent + '</a>');
-		$('#sendFeeAmout').val($('#sendAgent option:selected').data('fee'));
-	});
-	
-	$('#sendAgent').change();
-	
+
 	$('#sendSubmit').click(function() {
 		var btn = $(this),
 		from = $('#sendLogin').val(),
@@ -326,8 +319,34 @@ $(function() {
 	}
 		
 	var transaction,
-	id = gup('id');		
-	
+	id = gup('id');
+
+	$('#sendAgent').change(function() {
+		var agent = $('#sendAgent').val();
+		$('#sendFeeAmoutLabel').html('Комиссия от <a href="https://golos.io/@' + agent + '" target="_blank">@' + agent + '</a>');
+		$('#sendFeeAmout').val($('#sendAgent option:selected').data('fee'));
+	});
+
+	// добавляем гарантов из блокчейна, сортируем по репутации
+	steem.api.getContentReplies('xtar', 'khochesh-stat-garantom-bud-im', function(err, result) {
+		var agents = [];
+		if(!err) {
+			if(result.length) {
+				$('#sendAgent').html('');
+			}
+			result.sort(function(a, b) {
+				return a.author_reputation > b.author_reputation;
+			});
+			$.each(result, function(index, val) {
+				var matches = val.body.match(/^([0-9.]+) (.*)/);
+				$('#sendAgent').append('<option value="' + val.author + '" data-fee="' + matches[1] + '">' + val.author + ', комиссия ' + matches[1] + ', ' + matches[2] + '</option>');
+			});
+			$('#sendAgent').prop('disabled', false).change();
+		}
+	});
+
+
+
 	if(id) {
 		transaction = new Transaction(gup('id'), function(transaction) {
 			$('div.' + transaction.status).show();

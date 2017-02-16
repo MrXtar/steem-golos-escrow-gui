@@ -6,7 +6,7 @@
 	<title>Отправка GBG/GOLOS (с гарантом)</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script src="steem-golos.min.js?1"></script>		
-	<script src="main.js?5" type="text/javascript"></script>
+	<script src="main.js?6" type="text/javascript"></script>
 	<link rel="stylesheet" href="main.css?2">
 </head>
 
@@ -42,10 +42,9 @@
 	<a id="sendAmountUnit" href="#" class="inputToggle" data-toggles="GOLOS-GBG">GOLOS</a>
 </div><!-- /input-group -->
 
-<label><span style="float: right;"></span>Выберите гаранта</label>
-<select id="sendAgent" class="form-control">
-	<option value="on0tole" data-fee="1">on0tole</option>
-	<option value="xtar" data-fee="1">xtar</option>
+<label><span style="float: right;"></span>Выберите гаранта. Чтоб попасть в этот список, отписываемся <a href="https://golos.io/nsfw/@xtar/khochesh-stat-garantom-bud-im" target="_blank">вот тут</a>, сортировка списка по репутации гарантов.</label>
+<select id="sendAgent" class="form-control" disabled="disabled">
+	<option>Загрузка списка из блокчейна...</option>
 </select>
 
 <label id="sendFeeAmoutLabel">Комиссия</label>
