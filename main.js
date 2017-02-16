@@ -335,11 +335,16 @@ $(function() {
 				$('#sendAgent').html('');
 			}
 			result.sort(function(a, b) {
-				return a.author_reputation > b.author_reputation;
+				return a.author_reputation < b.author_reputation;
 			});
+			console.log(result);
 			$.each(result, function(index, val) {
-				var matches = val.body.match(/^([0-9.]+) (.*)/);
-				$('#sendAgent').append('<option value="' + val.author + '" data-fee="' + matches[1] + '">' + val.author + ', комиссия ' + matches[1] + ', ' + matches[2] + '</option>');
+				if(val.body !== undefined) {
+					var matches = val.body.match(/^([0-9.]+) (.*)/);
+					if(matches && matches.length == 3) {
+						$('#sendAgent').append('<option value="' + val.author + '" data-fee="' + parseFloat(matches[1]).toFixed(3) + '">' + val.author + ', комиссия ' + parseFloat(matches[1]).toFixed(3) + ', ' + matches[2] + '</option>');
+					}
+				}
 			});
 			$('#sendAgent').prop('disabled', false).change();
 		}
