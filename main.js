@@ -351,11 +351,16 @@ $(function() {
 			$('#tabCP').click();
 		}
 	} else {
+		
 		$('#tabSend').click();
-		if($('#sendLogin').val()) {
-			$('#sendPassword').focus();
+		if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+			$('#step1').html('<p>К сожалению, отправка пока не поддерживается браузером FireFox. Ждем обновлений <a href="https://github.com/steemit/steem-js" target="_blank">steem.js</a></p><p>Пожалуйста, воспользуйтесь браузерами Chrome, Opera или Яндекс.Браузер.</p>');
 		} else {
-			$('#sendLogin').focus();
+			if($('#sendLogin').val()) {
+				$('#sendPassword').focus();
+			} else {
+				$('#sendLogin').focus();
+			}
 		}
 	}
 	
