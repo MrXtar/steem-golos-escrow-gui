@@ -1,0 +1,252 @@
+<html lang="ru">
+
+<head>
+	<meta charset="utf-8">
+	<meta name=viewport content="width=device-width,initial-scale=1">
+	<title>Отправка GBG/GOLOS (с гарантом)</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script src="steem-golos.js?2"></script>		
+	<script src="main.js?2" type="text/javascript"></script>
+	<link rel="stylesheet" href="main.css?2">
+</head>
+
+<body>
+
+<div id="header">
+	<div class="container">
+		<ul id="tabs">
+			<li><a id="tabSend" href="/">Отправить GOLOS/GBG</a></li>
+			<li><a id="tabCP" href="/">Панель управления транзакцией</a></li>
+			<li class="right"><a target="_blank" href="https://github.com/MrXtar/golos-escrow">GitHub</a></li>
+		</ul>
+	</div>
+</div>
+
+<div id="content" class="container">
+
+<div id="step1" style="display: none;">
+
+<label>Введите Ваши логин и пароль / Active WIF</label>
+<div class="textGroup">
+	<input id="sendLogin" class="form-control" type="text" placeholder="Ваш логин">
+	<input id="sendPassword" class="form-control" type="password" placeholder="Ваш пароль / Active WIF">
+</div>
+
+
+<label>Введите логин получателя платежа</label>
+<input id="sendReceiver" class="form-control" type="text" placeholder="Логин получателя">
+
+<label>Введите сумму для отправки</label>
+<div class="inputWithToggles">
+	<input class="form-control" id="sendAmount" type="text" placeholder="Сумма, для переключения GOLOS/GBG кликни справа">
+	<a id="sendAmountUnit" href="#" class="inputToggle" data-toggles="GOLOS-GBG">GOLOS</a>
+</div><!-- /input-group -->
+
+<label><span style="float: right;"></span>Выберите гаранта</label>
+<select id="sendAgent" class="form-control">
+	<option value="on0tole" data-fee="1">on0tole</option>
+	<option value="xtar" data-fee="1">xtar</option>
+</select>
+
+<label id="sendFeeAmoutLabel">Комиссия</label>
+<div class="inputWithToggles">
+	<input class="form-control" disabled="disabled" id="sendFeeAmout" type="text">
+	<a href="#" class="inputToggle" data-toggles="GOLOS-GBG">GOLOS</a>
+</div><!-- /input-group -->
+
+<label>Укажите срок, по истечении которого деньги автоматически будут перечислены на счет получателя (для этого получатель и гарант должны дать согласия на проведение сделки)</label>
+<select id="sendEscrowExpiration" class="form-control">
+	<option value="24">24 часа</option>
+	<option value="48">48 часа</option>
+	<option value="72">72 часа</option>
+</select>
+
+<label>Условия сделки (не обязательно)</label>
+<input class="form-control" id="sendMeta" type="text" placeholder="Пригодятся в случае возникновения спорной ситуации">
+
+
+<button id="sendSubmit" class="btn btn-block btn-primary">Отправить</button>
+
+</div>
+
+<div id="sendError"></div>
+
+<div id="step2" style="display: none;">
+
+	<h2>Поздравляем!</h2>
+	<p>Транзакция успешно ушла в блокчейн.</p>
+	<p>Управлять состоянием транзакции можно по ссылке: <span class="sentLink"></span></p>			
+	<p>Дайте эту ссылку получателю и гаранту, чтоб они смогли согласится с условиями сделки.</p>
+	<p>Если он не сделают этого втечение <b>24 часов</b>, средства автоматически вернутся на Ваш счет.</p>
+	
+	<h2>Если не возникнет спорных ситуаций</h2>
+	<p>Если сделка прошла успешно, то больше никаких действий от гаранта не требуется.</p>
+	<p>Отправитель может отправить деньги получателю, либо получатель может вернуть деньги отправителю.</p>
+
+	<h2>Если возникнет спорная ситуация</h2>
+	<p>Если вдруг возникнет спорная ситуация, любая из сторон (получатель или отправитель) могут оспорить сделку.</p>
+	<p>После этого уже гарант будет решать, кому отправить средства.</p>
+
+</div>
+
+<div id="controlPanel" style="display: none;">	
+		<div id="result">
+	<div style="display: none;" class="alert alert-danger"><strong>Ошибка!</strong> Активный ордер с данным ID не найден в блокчейне.<br><br></div>
+	<table id="escrowData">
+		<tr>
+			<td>id транзакции</td>
+			<td>
+				<span class="transactionId">Загрузка...</span>
+			</td>
+		</tr>		
+		<tr>
+			<td>Отправитель</td>
+			<td>
+				<p><span class="transactionFrom">Загрузка...</span></p>
+				<div class="waitingForApproval hidden">
+					Отправитель ожидает, пока получатель и гарант дадут свое согласие на совершение данной сделки.
+				</div>
+				<div class="approvalRecieved hidden">
+					<p>Отправитель может либо отправить средства получателю, либо оспорить сделку:</p>
+					<button data-form="startDisputForm" data-nick="from" class="btn">Оспорить сделку</button>
+					<button data-form="releaseForm" data-nick="from" class="release btn btn-primary">Отправить средства получателю</button>
+				</div>
+				<div class="disputeInitiated hidden">
+					Отправитель ожидает принятия решения гарантом.
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>Получатель</td>
+			<td>
+				<p><span class="transactionTo">Загрузка...</span></p>
+				<div class="waitingForApprovalTo hidden">
+					<p>Получатель должен решить, согласен он с условиями сделки или нет:</p>
+					<button data-form="approveForm" data-answer="0" data-nick="to" class="approve btn">Не согласен</button>
+					<button data-form="approveForm" data-answer="1" data-nick="to" class="approve btn btn-primary">Согласен</button>
+				</div>
+				<div class="approvalRecieved hidden">
+					<p>Получатель может либо вернуть средства отправителю, либо оспортить сделку:</p>
+					<button data-form="startDisputForm" data-nick="to" class="btn">Оспорить сделку</button>
+					<button data-form="releaseForm" data-nick="to" class="release btn btn-success">Вернуть средства отправителю</button>
+				</div>
+				<div class="disputeInitiated hidden">
+					Получатель ожидает принятия решения гарантом.
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>Сумма</td>
+			<td>
+				<span class="transactionMoney">Загрузка...</span>
+			</td>
+		</tr>
+		<tr>
+			<td>Гарант</td>
+			<td>
+				<p><span class="transactionAgent">Загрузка...</span></p>
+				<div class="waitingForApprovalAgent hidden">
+					<p>Гарант должен решить, согласен он с условиями сделки или нет:</p>
+					<button data-form="approveForm" data-answer="0" data-nick="agent" class="approve btn">Не согласен</button>
+					<button data-form="approveForm" data-answer="1" data-nick="agent" class="approve btn btn-primary">Согласен</button>
+				</div>
+				<div class="approvalRecieved hidden">
+					Пока нет спорной ситуации, гарант ничего не делает.
+				</div>
+				<div class="disputeInitiated hidden">
+					<button data-form="escrowForm" data-answer="escrowFrom" data-nick="agent" class="approve btn btn-primary">Вернуть средства отправителю</button>
+					<button data-form="escrowForm" data-answer="escrowTo" data-nick="agent" class="approve btn btn-primary">Отправить средства получателю</button>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>Комиссия гаранта</td>
+			<td>
+				<span class="transactionFee">Загрузка...</span>
+			</td>
+		</tr>
+		<tr>
+			<td>Дата и время закрытия сделки</td>
+			<td>
+				<span class="transactionDate">Загрузка...</span>
+			</td>
+		</tr>
+	</table>
+</div>
+
+<style type="text/css">
+	form {
+		display: none;
+	}
+	td:first-child {
+		white-space: nowrap;
+		font-weight: bold;
+	}
+	td:last-child {
+		text-align: right;
+	}
+</style>
+
+<div id="sendTransaction" style="display: none;">	
+		
+		<label>Действие</label>
+		<select disabled="disabled" class="form-control" id="transactionType">
+			<option value="approveForm">Дать согласие (или отказ) на условия сделки</option>
+			<option value="releaseForm">Отправить деньги получателю</option>
+			<option value="cancelForm">Отменить сделку и отправить деньги отправителю</option>
+			<option value="startDisputForm">Оспорить сделку</option>
+			<option value="escrowForm">Гарант решит, кому отправить средства</option>
+		</select>
+		
+		<label>Введите Ваши логин и пароль / Active WIF</label>
+		<div class="textGroup">
+			<input disabled="disabled" id="login" class="form-control" type="text" placeholder="Ваш логин">
+			<input id="password" class="form-control" type="password" placeholder="Ваш пароль / Active WIF">
+		</div>
+		
+		<form id="approveForm" style="display: block;">			
+			<label>
+				<input id="approveYes" name="yesNo" type="radio" value="1"> Да, с условиями согласен, продолжить сделку
+			</label>
+			<label>
+				<input id="approveNo" name="yesNo" type="radio" value="0"> Нет, с условиями не согласен, отменить сделку
+			</label>
+			<input type="submit" class="btn btn-block btn-primary" value="Отправить">
+		</form>
+
+		<form id="releaseForm">
+			<input type="submit" class="btn btn-block btn-primary" value="Отправить все средства получателю">
+		</form>
+		
+		<form id="cancelForm">
+			<input type="submit" class="btn btn-block btn-primary" value="Отправить все средства отправителю">
+		</form>
+		
+		<form id="startDisputForm">
+			<input type="submit" class="btn btn-block btn-primary" value="Оспорить сделку">
+		</form>
+
+		<form id="escrowForm">			
+			<div class="radio">
+				<label>
+					<input id="escrowFrom" name="escrowAnswer" type="radio" value="escrowFrom"> Вернуть средства отправителю
+				</label>
+			</div>
+			<div class="radio">
+				<label>
+					<input id="escrowTo" name="escrowAnswer" type="radio" value="escrowTo"> Отправить средства получателю
+				</label>
+			</div>
+			<input type="submit" class="btn btn-block btn-primary" value="Отправить">
+		</form>
+
+		
+		</div>
+
+
+</div>
+
+</div>
+
+</body>
+</html>
