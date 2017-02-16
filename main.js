@@ -248,14 +248,15 @@ $(function() {
 			);
 		});
 	});
-	$('#escrowData').on('click', 'button', function() {	
-		$('#transactionType').val($(this).data('form'));	
+	$('#escrowData').on('click', 'button', function() {
+		$('#transactionType').val($(this).data('form'));
 		$('form').hide();
-		$('#' + $(this).data('form')).show();		
+		$('#' + $(this).data('form')).show();
 		$('#sendTransaction').hide();
-		$('#sendTransaction').slideDown();	
+		$('#sendTransaction').slideDown();
+		$('input[type=submit]').prop('disabled', false); // fix firefox page refresh
 		$('#login').val(transaction[$(this).data('nick')]);
-		$('#password').focus();
+		$('#password').val('').focus();
 		if($(this).data('answer') == '1') {
 			$('#approveYes').prop('checked', true);
 		} else if($(this).data('answer') == '0') {
@@ -343,7 +344,7 @@ $(function() {
 			$('span.transactionMoney').html(transaction.money);
 			$('span.transactionFee').html(transaction.pending_fee);
 			$('span.transactionDate').html(transaction.escrow_expiration);
-		});			
+		});
 		if(transaction.from === undefined) {
 			id = null;
 			$('#tabSend').click();
