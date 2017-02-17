@@ -347,6 +347,7 @@ $(function() {
 			if(!transaction.agent_approved) {
 				$('div.waitingForApprovalAgent').show();
 			}
+			//console.log(transaction);
 			$('span.transactionId').html('<a href="?id=' + transaction.from + '-' + transaction.escrow_id + '">' + transaction.from + '-' + transaction.escrow_id + '</a>');
 			$('span.transactionFrom').html('<a target="_blank" href="https://golos.io/@' + transaction.from + '">@' + transaction.from + '</a>');
 			$('span.transactionTo').html('<a target="_blank" href="https://golos.io/@' + transaction.to + '">@' + transaction.to + '</a>');
@@ -354,6 +355,7 @@ $(function() {
 			$('span.transactionMoney').html(transaction.money);
 			$('span.transactionFee').html(transaction.pending_fee);
 			$('span.transactionDate').html(transaction.escrow_expiration);
+			$('span.transactionDeadline').html(transaction.ratification_deadline);
 
 			var meta = '';
 			steem.api.getAccountHistory(
@@ -373,6 +375,10 @@ $(function() {
 					}
 				}
 			);
+
+			steem.api.getDynamicGlobalProperties(function(err, response) {
+				$('span.transactionDateCurrent').html(response.time);
+			});
 		});
 		if(transaction.from === undefined) {
 			id = null;
