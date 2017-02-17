@@ -359,7 +359,11 @@ $(function() {
 				$('#sendAgent').html('');
 			}
 			result.sort(function(a, b) {
-				return a.author_reputation < b.author_reputation;
+				if (parseInt(a.author_reputation) < parseInt(b.author_reputation))
+					return 1;
+				if (parseInt(a.author_reputation) > parseInt(b.author_reputation))
+					return -1;
+				return 0;
 			});
 			//console.log(result);
 			$.each(result, function(index, val) {
