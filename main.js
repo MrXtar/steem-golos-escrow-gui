@@ -201,10 +201,11 @@ $(function() {
 		}
 
 		steem.api.getDynamicGlobalProperties(function(err, response) {
-			var ratification_deadline = new Date(response.time);
+			// Added 'Z' to get correct UTC time in all browsers
+			var ratification_deadline = new Date(response.time+'Z');
 			ratification_deadline.setMinutes(ratification_deadline.getMinutes() + 24 * 60 - 1);
 						
-			var escrow_expiration = new Date(response.time);
+			var escrow_expiration = new Date(response.time+'Z');
 			escrow_expiration.setHours(escrow_expiration.getHours() + parseInt($('#sendEscrowExpiration').val()));			
 			
 			steem.broadcast.escrowTransfer(
@@ -216,8 +217,8 @@ $(function() {
 				sbd_amount, // amount gbg
 				steem_amount, // amount golos
 				fee, // fee
-				ratification_deadline.toYMD(),
-				escrow_expiration.toYMD(),
+				ratification_deadline,
+				escrow_expiration,
 				JSON.stringify(meta),
 				function(err, response) {
 					if(!err && response.ref_block_num) {
@@ -378,14 +379,11 @@ $(function() {
 	} else {
 		
 		$('#tabSend').click();
-		if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
-			$('#step1').html('<p>К сожалению, отправка пока не поддерживается браузером FireFox. Ждем обновлений <a href="https://github.com/steemit/steem-js" target="_blank">steem.js</a></p><p>Пожалуйста, воспользуйтесь браузерами Chrome, Opera или Яндекс.Браузер.</p>');
+
+		if($('#sendLogin').val()) {
+			$('#sendPassword').focus();
 		} else {
-			if($('#sendLogin').val()) {
-				$('#sendPassword').focus();
-			} else {
-				$('#sendLogin').focus();
-			}
+			$('#sendLogin').focus();
 		}
 	}
 	
