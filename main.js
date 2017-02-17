@@ -17,7 +17,7 @@ function gup( name ) {
 	return results[1];
 }		
 
-function Transaction(id, onLoadCallback) {
+function Transaction(id, currentDate, onLoadCallback) {
 	if(!id.match( /^[a-z0-9\.\-]+-[\d]+$/ )) {
 		alert('Не верный ID ' + id);
 		return false;
@@ -35,25 +35,30 @@ function Transaction(id, onLoadCallback) {
 			if(!err && !response) {
 				$('#result div.alert-danger').slideDown();
 			} else if (typeof response == 'object') {
-				//console.log(response);
 				$.each(response, function(index, value) {
 					obj[index] = value;
-				}); 
+				});
+
 				if(obj.steem_balance == '0.000 GOLOS') {
 					obj.money = obj.sbd_balance;
 				} else {
 					obj.money = obj.steem_balance;
 				}
-				
-				
+
+				var transactionDateExpire = new Date(obj.escrow_expiration);
+
 				if(!obj.agent_approved || !obj.to_approved) {
 					obj.status = 'waitingForApproval';
 				} else if (obj.disputed) {
 					obj.status = 'disputeInitiated';
+				} else if (transactionDateExpire < currentDate) {
+					obj.status = 'escrowExpired';
 				} else {
 					obj.status = 'approvalRecieved';
 				}
-				
+
+				console.log(obj);
+
 				onLoadCallback(obj);
 			}
 			//console.log(err, obj);
@@ -94,6 +99,24 @@ function Transaction(id, onLoadCallback) {
 			);
 	}
 	
+	obj.submitExpired = function(login, pass, callback) {
+			steem.broadcast.escrowRelease(
+				passToWif(login, pass),
+				obj.from,
+				obj.to,
+				obj.agent,
+				login,
+				login == obj.from ? obj.from : obj.to,
+				obj.escrow_id,
+				obj.sbd_balance,
+				obj.steem_balance,
+				function(err, response) {
+					//console.log(err, response);
+					callback();
+				}
+			);
+	}
+
 	obj.submitDispute = function(login, pass, callback) {
 		steem.broadcast.escrowDispute(
 			passToWif(login, pass),
@@ -188,9 +211,9 @@ $(function() {
 			// Added 'Z' to get correct UTC time in all browsers
 			var ratification_deadline = new Date(response.time+'Z');
 			ratification_deadline.setMinutes(ratification_deadline.getMinutes() + parseInt($('#sendDeadline').val()) * 60 - 1);
-						
+
 			var escrow_expiration = new Date(response.time+'Z');
-			escrow_expiration.setHours(escrow_expiration.getHours() + parseInt($('#sendEscrowExpiration').val()));			
+			escrow_expiration.setHours(escrow_expiration.getHours() + parseInt($('#sendEscrowExpiration').val()));
 
 
 			//return false;
@@ -262,7 +285,7 @@ $(function() {
 		return false;
 	});
 
-	$('#releaseForm, #cancelForm').submit(function(e) {			
+	$('#releaseForm, #cancelForm').submit(function(e) {
 		$(this).find('input[type=submit]').prop('disabled', true);
 		e.preventDefault();
 		transaction.submitRelease(
@@ -275,14 +298,28 @@ $(function() {
 		return false;
 	});
 
-	$('#startDisputForm').submit(function(e) {	
+	$('#expiredForm').submit(function(e) {
+		$(this).find('input[type=submit]').prop('disabled', true);
+		e.preventDefault();
+		transaction.submitExpired(
+			$('#login').val(),
+			$('#password').val(),
+			function(err, response) {
+				location.reload();
+			}
+		);
+		return false;
+	});
+
+	$('#startDisputForm').submit(function(e) {
 		$(this).find('input[type=submit]').prop('disabled', true);
 		e.preventDefault();
 		transaction.submitDispute(
 			$('#login').val(),
 			$('#password').val(),
 			function(err, response) {
-				location.reload();
+				console.log(err, response);
+				//location.reload();
 			}
 		);
 		return false;
@@ -306,7 +343,8 @@ $(function() {
 	}
 		
 	var transaction,
-	id = gup('id');
+	id = gup('id'),
+	blockchainDatetime;
 
 	$('#sendAgent').change(function() {
 		var agent = $('#sendAgent').val();
@@ -339,53 +377,55 @@ $(function() {
 
 
 	if(id) {
-		transaction = new Transaction(gup('id'), function(transaction) {
-			$('div.' + transaction.status).show();
-			if(!transaction.to_approved) {
-				$('div.waitingForApprovalTo').show();
-			}
-			if(!transaction.agent_approved) {
-				$('div.waitingForApprovalAgent').show();
-			}
-			//console.log(transaction);
-			$('span.transactionId').html('<a href="?id=' + transaction.from + '-' + transaction.escrow_id + '">' + transaction.from + '-' + transaction.escrow_id + '</a>');
-			$('span.transactionFrom').html('<a target="_blank" href="https://golos.io/@' + transaction.from + '">@' + transaction.from + '</a>');
-			$('span.transactionTo').html('<a target="_blank" href="https://golos.io/@' + transaction.to + '">@' + transaction.to + '</a>');
-			$('span.transactionAgent').html('<a target="_blank" href="https://golos.io/@' + transaction.agent + '">@' + transaction.agent + '</a>');
-			$('span.transactionMoney').html(transaction.money);
-			$('span.transactionFee').html(transaction.pending_fee);
-			$('span.transactionDate').html(transaction.escrow_expiration);
-			$('span.transactionDeadline').html(transaction.ratification_deadline);
-
-			var meta = '';
-			steem.api.getAccountHistory(
-				transaction.from,
-				-1,
-				100,
-				function(err, response) {
-					if(!err && response.length) {
-						$.each(response, function(index, val) {
-							if(val[1]['op'][0] == 'escrow_transfer') {
-								if(parseInt(val[1]['op'][1]['escrow_id']) == parseInt(transaction.escrow_id)) {
-									meta = $.parseJSON(val[1]['op'][1]['json_meta']);
-								}
-							}
-						});
-						$('span.transactionMeta').html(meta.meta !== undefined ? meta.meta : JSON.stringify(meta));
-					}
+		steem.api.getDynamicGlobalProperties(function(err, response) {
+			blockchainDatetime = new Date(response.time + 'Z');
+			$('span.transactionDateCurrent').html(response.time);
+			transaction = new Transaction(gup('id'), blockchainDatetime, function(transaction) {
+				$('div.' + transaction.status).show();
+				if(!transaction.to_approved) {
+					$('div.waitingForApprovalTo').show();
 				}
-			);
+				if(!transaction.agent_approved) {
+					$('div.waitingForApprovalAgent').show();
+				}
+				//console.log(transaction);
+				$('span.transactionId').html('<a href="?id=' + transaction.from + '-' + transaction.escrow_id + '">' + transaction.from + '-' + transaction.escrow_id + '</a>');
+				$('span.transactionFrom').html('<a target="_blank" href="https://golos.io/@' + transaction.from + '">@' + transaction.from + '</a>');
+				$('span.transactionTo').html('<a target="_blank" href="https://golos.io/@' + transaction.to + '">@' + transaction.to + '</a>');
+				$('span.transactionAgent').html('<a target="_blank" href="https://golos.io/@' + transaction.agent + '">@' + transaction.agent + '</a>');
+				$('span.transactionMoney').html(transaction.money);
+				$('span.transactionFee').html(transaction.pending_fee);
+				$('span.transactionDate').html(transaction.escrow_expiration);
+				$('span.transactionDeadline').html(transaction.ratification_deadline);
 
-			steem.api.getDynamicGlobalProperties(function(err, response) {
-				$('span.transactionDateCurrent').html(response.time);
+				var meta = '';
+				steem.api.getAccountHistory(
+						transaction.from,
+						-1,
+						100,
+						function(err, response) {
+							if(!err && response.length) {
+								$.each(response, function(index, val) {
+									if(val[1]['op'][0] == 'escrow_transfer') {
+										if(parseInt(val[1]['op'][1]['escrow_id']) == parseInt(transaction.escrow_id)) {
+											meta = $.parseJSON(val[1]['op'][1]['json_meta']);
+										}
+									}
+								});
+								$('span.transactionMeta').html(meta.meta !== undefined ? meta.meta : JSON.stringify(meta));
+							}
+						}
+				);
 			});
+			if(transaction.from === undefined) {
+				id = null;
+				$('#tabSend').click();
+			} else {
+				$('#tabCP').click();
+			}
 		});
-		if(transaction.from === undefined) {
-			id = null;
-			$('#tabSend').click();
-		} else {
-			$('#tabCP').click();
-		}
+
+
 	} else {
 		
 		$('#tabSend').click();
