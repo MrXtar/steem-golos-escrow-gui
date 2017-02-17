@@ -1,14 +1,3 @@
-Date.prototype.toYMD = Date_toYMD;
-function Date_toYMD() {
-	var year = String(this.getFullYear()),
-	month = ('00' + (this.getUTCMonth()+1)).slice(-2), 
-	day = ('00' + this.getUTCDate()).slice(-2), 
-	hours = ('00' + this.getUTCHours()).slice(-2), 
-	minutes = ('00' + this.getUTCMinutes()).slice(-2), 
-	seconds = ('00' + this.getUTCSeconds()).slice(-2);
-	return year + "-" + month + "-" + day + 'T' + hours + ':' + minutes + ':' + seconds;
-}
-
 function passToWif(login, pass) {
 	if(pass.charAt(0) == '5' && pass.length == 51) {
 		return pass;
@@ -207,7 +196,12 @@ $(function() {
 						
 			var escrow_expiration = new Date(response.time+'Z');
 			escrow_expiration.setHours(escrow_expiration.getHours() + parseInt($('#sendEscrowExpiration').val()));			
-			
+
+
+			console.log(response.time);
+			console.log(ratification_deadline);
+			console.log(escrow_expiration);
+			//return false;
 			steem.broadcast.escrowTransfer(
 				wif, // active key
 				from,
@@ -330,7 +324,6 @@ $(function() {
 
 	// добавляем гарантов из блокчейна, сортируем по репутации
 	steem.api.getContentReplies('xtar', 'khochesh-stat-garantom-bud-im', function(err, result) {
-		var agents = [];
 		if(!err) {
 			if(result.length) {
 				$('#sendAgent').html('');
