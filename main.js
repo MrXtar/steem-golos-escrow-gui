@@ -146,13 +146,8 @@ $(function() {
 			if(!id) {
 				return false;
 			}
-			transaction = new Transaction(id);
-			if(transaction.from === undefined) {
-				id = null;
-				return false;
-			}
+			window.location.replace("?id=" + id);
 		}
-		window.history.pushState('',id, '?id=' + id);
 		$(this).parent().addClass('active').siblings().removeClass('active');
 		$('#step1, #step2').hide();				
 		$('#controlPanel').show();
@@ -359,6 +354,25 @@ $(function() {
 			$('span.transactionMoney').html(transaction.money);
 			$('span.transactionFee').html(transaction.pending_fee);
 			$('span.transactionDate').html(transaction.escrow_expiration);
+
+			var meta = '';
+			steem.api.getAccountHistory(
+				transaction.from,
+				-1,
+				100,
+				function(err, response) {
+					if(!err && response.length) {
+						$.each(response, function(index, val) {
+							if(val[1]['op'][0] == 'escrow_transfer') {
+								if(parseInt(val[1]['op'][1]['escrow_id']) == parseInt(transaction.escrow_id)) {
+									meta = $.parseJSON(val[1]['op'][1]['json_meta']);
+								}
+							}
+						});
+						$('span.transactionMeta').html(JSON.stringify(meta));
+					}
+				}
+			);
 		});
 		if(transaction.from === undefined) {
 			id = null;
