@@ -6,7 +6,7 @@
 	<title>Отправка GBG/GOLOS (с гарантом)</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script src="steem-golos.min.js?2"></script>
-	<script src="main.js?16" type="text/javascript"></script>
+	<script src="main.js?17" type="text/javascript"></script>
 	<link rel="stylesheet" href="main.css?3">
 </head>
 
@@ -43,15 +43,17 @@
 </div><!-- /input-group -->
 
 <label><span style="float: right;"></span>Выберите гаранта. Чтоб попасть в этот список, отписываемся <a href="https://golos.io/nsfw/@xtar/khochesh-stat-garantom-bud-im" target="_blank">вот тут</a>, сортировка списка по репутации гарантов:</label>
-<select id="sendAgent" class="form-control" disabled="disabled">
-	<option>Загрузка списка из блокчейна...</option>
+<select id="sendAgent" class="form-control">
+	<option value="">Выберите гаранта...</option>
 </select>
 
-<label id="sendFeeAmoutLabel">Комиссия:</label>
-<div class="inputWithToggles">
+<div id="agentFeeWrap" style="display: none;">
+	<label id="sendFeeAmoutLabel">Комиссия:</label>
+	<div class="inputWithToggles">
 	<input class="form-control" disabled="disabled" id="sendFeeAmout" type="text">
 	<a href="#" class="inputToggle" data-toggles="GOLOS-GBG">GOLOS</a>
-</div><!-- /input-group -->
+	</div><!-- /input-group -->
+</div>
 
 <label>Укажите срок, втечение которого получатель и гарант должны дать свое согласие на совершение данной сделки. Если они не успеют этого сделать, средства автоматически вернутся на счет отправителя:</label>
 <select id="sendDeadline" class="form-control">

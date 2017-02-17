@@ -198,6 +198,10 @@ $(function() {
 		meta = {
 			meta: $('#sendMeta').val()
 		};
+
+		if(!from || !to || !agent || !fee) {
+			return false;
+		}
 		
 		btn.prop('disabled', true);
 		
@@ -240,10 +244,13 @@ $(function() {
 						$('.sentLink').html('<a href="?id=' + from + '-' + escrow_id + '">https://golosim.ru/escrow/?id=' + from + '-' + escrow_id + '</a>');
 						$('.sentId').html(from + '-' + escrow_id);
 					} else {
-						$('#sendError').html(
-							'<br><b>Возникла ошибка:</b><br><br>' +
-							err.payload.error.message.replace(/([^>])\n/g, '$1<br><br>')
-						);
+						console.log(err);
+						$('#sendError').html('<br><b>Возникла ошибка:</b><br><br>');
+						if(err.payload !== undefined) {
+							$('#sendError').append(err.payload.error.message.replace(/([^>])\n/g, '$1<br><br>'));
+						} else {
+							$('#sendError').append(err);
+						}
 						btn.prop('disabled', false);
 					}
 					//console.log(err, response);
@@ -348,6 +355,11 @@ $(function() {
 
 	$('#sendAgent').change(function() {
 		var agent = $('#sendAgent').val();
+		if(agent) {
+			$('#agentFeeWrap').slideDown();
+		} else {
+			$('#agentFeeWrap').slideUp();
+		}
 		$('#sendFeeAmoutLabel').html('Комиссия от <a href="https://golos.io/@' + agent + '" target="_blank">@' + agent + '</a>');
 		$('#sendFeeAmout').val($('#sendAgent option:selected').data('fee'));
 	});
@@ -355,9 +367,6 @@ $(function() {
 	// добавляем гарантов из блокчейна, сортируем по репутации
 	steem.api.getContentReplies('xtar', 'khochesh-stat-garantom-bud-im', function(err, result) {
 		if(!err) {
-			if(result.length) {
-				$('#sendAgent').html('');
-			}
 			result.sort(function(a, b) {
 				if (parseInt(a.author_reputation) < parseInt(b.author_reputation))
 					return 1;
@@ -374,7 +383,7 @@ $(function() {
 					}
 				}
 			});
-			$('#sendAgent').prop('disabled', false).change();
+			//$('#sendAgent').prop('disabled', false).change();
 		}
 	});
 
