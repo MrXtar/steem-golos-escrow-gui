@@ -371,7 +371,7 @@ $(function() {
 								}
 							}
 						});
-						$('span.transactionMeta').html(JSON.stringify(meta));
+						$('span.transactionMeta').html(meta.meta !== undefined ? meta.meta : JSON.stringify(meta));
 					}
 				}
 			);
