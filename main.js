@@ -35,7 +35,7 @@ function Transaction(id, onLoadCallback) {
 			if(!err && !response) {
 				$('#result div.alert-danger').slideDown();
 			} else if (typeof response == 'object') {
-				console.log(response);
+				//console.log(response);
 				$.each(response, function(index, value) {
 					obj[index] = value;
 				}); 
@@ -56,7 +56,7 @@ function Transaction(id, onLoadCallback) {
 				
 				onLoadCallback(obj);
 			}
-			console.log(err, obj);
+			//console.log(err, obj);
 		}
 	);
 
@@ -70,7 +70,7 @@ function Transaction(id, onLoadCallback) {
 			obj.escrow_id,
 			approve,
 			function(err, response) {
-				console.log(err, response);
+				//console.log(err, response);
 				callback();
 			}
 		);
@@ -88,7 +88,7 @@ function Transaction(id, onLoadCallback) {
 				obj.sbd_balance,
 				obj.steem_balance,
 				function(err, response) {
-					console.log(err, response);
+					//console.log(err, response);
 					callback();
 				}
 			);
@@ -103,7 +103,7 @@ function Transaction(id, onLoadCallback) {
 			login,			
 			obj.escrow_id,
 			function(err, response) {
-				console.log(err, response);
+				//console.log(err, response);
 				callback();
 			}
 		);
@@ -121,7 +121,7 @@ function Transaction(id, onLoadCallback) {
 			obj.sbd_balance,
 			obj.steem_balance,
 			function(err, response) {
-				console.log(err, response);
+				//console.log(err, response);
 				callback();
 			}
 		);
@@ -198,9 +198,6 @@ $(function() {
 			escrow_expiration.setHours(escrow_expiration.getHours() + parseInt($('#sendEscrowExpiration').val()));			
 
 
-			console.log(response.time);
-			console.log(ratification_deadline);
-			console.log(escrow_expiration);
 			//return false;
 			steem.broadcast.escrowTransfer(
 				wif, // active key
@@ -231,7 +228,7 @@ $(function() {
 						);
 						btn.prop('disabled', false);
 					}
-					console.log(err, response);
+					//console.log(err, response);
 				}
 			);
 		});
@@ -331,7 +328,7 @@ $(function() {
 			result.sort(function(a, b) {
 				return a.author_reputation < b.author_reputation;
 			});
-			console.log(result);
+			//console.log(result);
 			$.each(result, function(index, val) {
 				if(val.body !== undefined) {
 					var matches = val.body.match(/^([0-9.]+) (.*)/);
