@@ -6,7 +6,7 @@
 	<title>Отправка GBG/GOLOS (с гарантом)</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script src="steem-golos.min.js?2"></script>
-	<script src="main.js?12" type="text/javascript"></script>
+	<script src="main.js?13" type="text/javascript"></script>
 	<link rel="stylesheet" href="main.css?2">
 </head>
 
@@ -53,7 +53,23 @@
 	<a href="#" class="inputToggle" data-toggles="GOLOS-GBG">GOLOS</a>
 </div><!-- /input-group -->
 
-<label>Укажите срок, по истечении которого деньги автоматически будут перечислены на счет получателя (для этого получатель и гарант должны дать согласия на проведение сделки)</label>
+<label>Укажите срок, втечение которого получатель и гарант должны дать свое согласие на совершение данной сделки</label>
+<select id="sendDeadline" class="form-control">
+	<option value="24">24 часа</option>
+	<option value="48">2 дня</option>
+	<option value="72">3 дня</option>
+	<option value="96">4 дня</option>
+	<option value="120">5 дней</option>
+	<option value="144">6 дней</option>
+	<option value="168">1 неделя</option>
+	<option value="336">2 недели</option>
+	<option value="504">3 недели</option>
+	<option value="730">1 месяц</option>
+	<option value="1460">2 месяц</option>
+	<option value="2190">3 месяца</option>
+</select>
+
+<label>Укажите срок, по истечении которого деньги автоматически будут перечислены на счет получателя (этот срок не должен быть меньше предыдущего)</label>
 <select id="sendEscrowExpiration" class="form-control">
 	<option value="24">24 часа</option>
 	<option value="48">2 дня</option>

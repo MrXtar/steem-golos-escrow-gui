@@ -187,7 +187,7 @@ $(function() {
 		steem.api.getDynamicGlobalProperties(function(err, response) {
 			// Added 'Z' to get correct UTC time in all browsers
 			var ratification_deadline = new Date(response.time+'Z');
-			ratification_deadline.setMinutes(ratification_deadline.getMinutes() + 24 * 60 - 1);
+			ratification_deadline.setMinutes(ratification_deadline.getMinutes() + parseInt($('#sendDeadline').val()) * 60 - 1);
 						
 			var escrow_expiration = new Date(response.time+'Z');
 			escrow_expiration.setHours(escrow_expiration.getHours() + parseInt($('#sendEscrowExpiration').val()));			
