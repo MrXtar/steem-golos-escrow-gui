@@ -401,9 +401,11 @@ $(function() {
 			$.each(result, function(index, val) {
 				if(val.body !== undefined) {
 					var matches = val.body.match(/^([0-9.]+) (.*)/);
-					matches[1] = 0.001;
-					if(matches && matches.length == 3) {
-						$('#sendAgent').append('<option value="' + val.author + '" data-fee="' + parseFloat(matches[1]).toFixed(3) + '">' + val.author + ', ' + LNG.words.reputation[currentLanguage] + ' ' + (Math.max( Math.log10(Math.abs(parseInt(val.author_reputation))) - 9, 0) * (parseInt(val.author_reputation) > 0 ? 1 : -1) * 9 + 25).toFixed(1) + ', ' + LNG.words.fee[currentLanguage] + ' ' + parseFloat(matches[1]).toFixed(3) + ', ' + matches[2] + '</option>');
+					if(matches) {
+						matches[1] = 0.001;
+						if (matches && matches.length == 3) {
+							$('#sendAgent').append('<option value="' + val.author + '" data-fee="' + parseFloat(matches[1]).toFixed(3) + '">' + val.author + ', ' + LNG.words.reputation[currentLanguage] + ' ' + (Math.max(Math.log10(Math.abs(parseInt(val.author_reputation))) - 9, 0) * (parseInt(val.author_reputation) > 0 ? 1 : -1) * 9 + 25).toFixed(1) + ', ' + LNG.words.fee[currentLanguage] + ' ' + parseFloat(matches[1]).toFixed(3) + ', ' + matches[2] + '</option>');
+						}
 					}
 				}
 			});
