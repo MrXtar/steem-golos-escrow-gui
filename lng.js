@@ -153,7 +153,7 @@ LNG = {
 		},
 		labelDeadline: {
 			ru: 'Укажите срок, втечение которого получатель и гарант должны дать свое согласие на совершение данной сделки. Если они не успеют этого сделать, средства автоматически вернутся на счет отправителя:',
-			en: 'Specify the period within which the recipient and the escrow must agree to commit the transaction. If they don''t approve the transaction before the deadline, the funds will be automatically returned to the sender:'
+			en: "Specify the period within which the recipient and the escrow must agree to commit the transaction. If they don't approve the transaction before the deadline, the funds will be automatically returned to the sender:"
 		},
 		labelEscrowEndDate: {
 			ru: 'Укажите срок действия гаранта, по истечении которого любая из сторон сможет принять любое решение (либо забрать деньги себе, либо отправить второй стороне). Этот срок не может быть меньше предыдущего:',
