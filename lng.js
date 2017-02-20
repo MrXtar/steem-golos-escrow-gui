@@ -15,7 +15,7 @@ function gup( name ) {
 var blockchain = gup('blockchain'),
 	transaction = {
 		id: gup('id')
-	}, parts;
+	};
 
 if(blockchain) {
 	if(blockchain == 'GOLOS') {
@@ -24,12 +24,13 @@ if(blockchain) {
 		currentLanguage = 'en';
 	}
 } else {
-	if (transaction.id.match(/^[a-z0-9\.\-]+-[\d]+-[steem|golos]+$/)) {
-		parts = transaction.id.split('-');
-		transaction.from = parts[0];
-		transaction.escrow_id = parseInt(parts[1]);
-		if (parts[2] !== undefined) {
-			if (parts[2] == 'steem') {
+	var matches = transaction.id.match(/^([a-z0-9\.\-]+)-([\d]+)-([steem|golos]+)$/);
+	console.log(matches);
+	if (matches.length) {
+		transaction.from = matches[1];
+		transaction.escrow_id = parseInt(matches[2]);
+		if (matches[3] !== undefined) {
+			if (matches[3] == 'steem') {
 				currentLanguage = 'en';
 			}
 		}
