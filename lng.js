@@ -109,7 +109,7 @@ LNG = {
 		},
 		tabCP: {
 			ru: 'Панель управления транзакцией',
-			en: 'Transaction CP'
+			en: 'Transaction Control Panel'
 		},
 		labelLogin: {
 			ru: 'Введите Ваши логин и пароль / Active WIF:',
@@ -125,23 +125,23 @@ LNG = {
 		},
 		labelReceiver: {
 			ru: 'Введите логин получателя платежа:',
-			en: "Receiver's login:"
+			en: "Enter the recipient's username:"
 		},
 		inputSendReceiver: {
 			ru: 'Логин получателя',
-			en: "Receiver's login"
+			en: "Receiver's username"
 		},
 		labelAmount: {
 			ru: 'Введите сумму для отправки',
-			en: 'Enter amount:'
+			en: 'Amount to send:'
 		},
 		labelAgent: {
 			ru: 'Выберите гаранта. Чтоб попасть в этот список, отписываемся <a href="https://golos.io/nsfw/@xtar/khochesh-stat-garantom-bud-im" target="_blank">вот тут</a>, сортировка списка по репутации гарантов:',
-			en: 'Choose escrow agent. To become agent post comment <a href="https://steemit.com/test/@xtar/escrow-agents-homepage">here</a> (sort by agent reputation).'
+			en: 'Choose the escrow agent. To become an agent, post a comment <a href="https://steemit.com/test/@xtar/escrow-agents-homepage">here</a> (sorted by agent reputation).'
 		},
 		selectOptionChooseAgent: {
 			ru: 'Выберите гаранта...',
-			en: 'Choose agent from list'
+			en: 'Choose an agent from the list'
 		},
 		labelSendFeeAmout: {
 			ru: 'Комиссия от',
@@ -153,15 +153,15 @@ LNG = {
 		},
 		labelDeadline: {
 			ru: 'Укажите срок, втечение которого получатель и гарант должны дать свое согласие на совершение данной сделки. Если они не успеют этого сделать, средства автоматически вернутся на счет отправителя:',
-			en: 'Approve deadline date. If receiver or agent will not approve before deadline, funds will return to sender:'
+			en: 'Specify the period within which the recipient and the escrow must agree to commit the transaction. If they don''t approve the transaction before the deadline, the funds will be automatically returned to the sender:'
 		},
 		labelEscrowEndDate: {
 			ru: 'Укажите срок действия гаранта, по истечении которого любая из сторон сможет принять любое решение (либо забрать деньги себе, либо отправить второй стороне). Этот срок не может быть меньше предыдущего:',
-			en: 'Escrow expiration date. After this date sender and reciever may take funds to themself or send to another side.'
+			en: 'Specify the warranty expiration period after which either party can take any action (either take the money or send the other party). This period cannot be less than the previous one:'
 		},
 		labelTransactionTerms: {
 			ru: 'Условия сделки (не обязательно, но крайне желательно)',
-			en: 'Terms of a transaction (optional)'
+			en: 'Terms of the transaction (optional, but highly recommended)'
 		},
 		inputSendMeta: {
 			ru: 'Будут нужны в случае возникновения спорной ситуации',
@@ -201,15 +201,15 @@ LNG = {
 		},
 		tdMeta: {
 			ru: 'Условия сделки',
-			en: 'Terms of a transaction'
+			en: 'Terms of transaction'
 		},
 		actionSenderWaitingForApproval: {
 			ru: 'Отправитель ожидает, пока получатель и гарант дадут свое согласие на совершение данной сделки. Если до <span class="transactionDeadline"></span> хоть одна из сторон не согласится, средства автоматически вернутся отправителю.',
-			en: 'Sender waiting for approval from receiver and agent. It someone will not approve before <span class="transactionDeadline"></span> the funds will return to sender'
+			en: 'Sender is waiting for approval from receiver and agent. If nobody approves the transaction before <span class="transactionDeadline"></span>, the funds will be returned to the sender'
 		},
 		actionSenderApprovalReceived: {
 			ru: 'Отправитель может либо отправить средства получателю, либо оспорить сделку:',
-			en: 'Sender can send funds to receiver or start dispute:'
+			en: 'Sender can either send the funds to the receiver or start a dispute:'
 		},
 		actionSenderWaitingEscrow: {
 			ru: 'Отправитель ожидает принятия решения гарантом.',
@@ -217,15 +217,15 @@ LNG = {
 		},
 		actionSenderEscrowExpired: {
 			ru: 'Срок действия гаранта истёк',
-			en: 'Escrow time was ended'
+			en: 'Escrow warranty period expired'
 		},
 		actionReceiverWaitingForApproval: {
 			ru: 'Получатель должен решить, согласен он с условиями сделки или нет:',
-			en: 'Receiver must approve or disapprove deal:'
+			en: 'Receiver must approve or disapprove the transaction:'
 		},
 		actionReceiverApprovalReceived: {
 			ru: 'Получатель может либо вернуть средства отправителю, либо оспорить сделку:',
-			en: 'Receiver can send funds back to sender or start dispute:'
+			en: 'Receiver can send funds back to the sender or start a dispute:'
 		},
 		actionReceiverWaitingEscrow: {
 			ru: 'Получатель ожидает принятия решения гарантом.',
@@ -233,19 +233,19 @@ LNG = {
 		},
 		actionReceiverEscrowExpired: {
 			ru: 'Срок действия гаранта истёк',
-			en: 'Escrow time was ended'
+			en: 'Escrow warranty period expired'
 		},
 		agentWaitingForApproval: {
 			ru: 'Гарант должен решить, согласен он с условиями сделки или нет:',
-			en: 'Escrow agent must to approve or disapprove deal:'
+			en: 'Escrow agent must approve or disapprove the transaction:'
 		},
 		agentApprovalRecieved: {
 			ru: 'Пока нет спорной ситуации, гарант ничего не делает.',
-			en: 'Escrow agent do nothing till dispute will started.'
+			en: 'No dispute yet. Escrow agent has nothing to do.'
 		},
 		agentEscrowExpired: {
 			ru: 'Срок действия гаранта истёк. Теперь любая из сторон может принять любое решение.',
-			en: 'Deal escrow expired. Now anybody can take funds or send to another side.'
+			en: 'Escrow warranty period expired. Now, anybody can take the funds or send them to the other party.'
 		},
 		labelAction: {
 			ru: 'Действие',
@@ -253,7 +253,7 @@ LNG = {
 		},
 		actionApproveForm: {
 			ru: 'Дать согласие (или отказ) на условия сделки',
-			en: 'Approve or disapprove deal'
+			en: 'Approve or disapprove transaction'
 		},
 		actionReleaseForm: {
 			ru: 'Отправить средства получателю',
@@ -261,11 +261,11 @@ LNG = {
 		},
 		actionCancelForm: {
 			ru: 'Отменить сделку и отправить деньги отправителю',
-			en: 'Cancel deal and return funds to sender'
+			en: 'Cancel transaction and return funds to the sender'
 		},
 		actionStartDisputeForm: {
 			ru: 'Оспорить сделку',
-			en: 'Start dispute'
+			en: 'Start a dispute'
 		},
 		actionEscrowForm: {
 			ru: 'Гарант решит, кому отправить средства',
@@ -273,7 +273,7 @@ LNG = {
 		},
 		actionExpiredForm: {
 			ru: 'Срок действия гаранта истек, забираю средства себе',
-			en: "Escrow date expired, i'm taking funds to me"
+			en: "Escrow warranty period expired, I keep the funds for me"
 		},
 		actionLoginPassword: {
 			ru: 'Введите Ваши логин и пароль / Active WIF',
@@ -289,15 +289,15 @@ LNG = {
 		},
 		actionApproveFormYes: {
 			ru: 'Да, с условиями согласен, продолжить сделку',
-			en: 'Yes, approve deal'
+			en: 'Yes, approve transaction'
 		},
 		actionApproveFormNo: {
 			ru: 'Нет, с условиями не согласен, отменить сделку',
-			en: 'No, disapprove and cancel deal'
+			en: 'No, disapprove and cancel transaction'
 		},
 		errorTransactionNotFound: {
 			ru: '<strong>Ошибка!</strong> Активный ордер с данным ID не найден в блокчейне.',
-			en: '<strong>Error!</strong> Active order with this ID not found in blockchain.'
+			en: '<strong>Error!</strong> No active order with this ID in the blockchain.'
 		}
 	}, byClass: {
 		inputToggle: {
@@ -374,7 +374,7 @@ LNG = {
 		},
 		buttonDisapproveDeal: {
 			ru: 'Не согласен (отменить сделку)',
-			en: 'Disapprove and cancel deal'
+			en: 'Disapprove and cancel transaction'
 		},
 		buttonApproveDeal: {
 			ru: 'Согласен',
