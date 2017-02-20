@@ -15,7 +15,8 @@ function loadTransaction() {
 			transaction.escrow_id,
 			function(err, response) {
 				if(!err && !response) {
-					$('#result div.alert-danger').slideDown();
+					$('#errorTransactionNotFound').slideDown();
+					$('#escrowData').slideUp();
 				} else if (typeof response == 'object') {
 					$.each(response, function(index, value) {
 						if(transaction[index] == undefined) {
