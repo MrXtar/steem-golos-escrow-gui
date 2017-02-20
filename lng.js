@@ -128,7 +128,7 @@ LNG = {
 		},
 		inputSendReceiver: {
 			ru: 'Логин получателя',
-			en: "Receiver's login"
+			en: "Receiver's username"
 		},
 		labelAmount: {
 			ru: 'Введите сумму для отправки',
@@ -249,7 +249,7 @@ LNG = {
 		labelAction: {
 			ru: 'Действие',
 			en: 'Action'
-		},себе
+		},
 		actionApproveForm: {
 			ru: 'Дать согласие (или отказ) на условия сделки',
 			en: 'Approve or disapprove transaction'
