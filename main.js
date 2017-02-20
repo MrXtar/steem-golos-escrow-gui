@@ -6,7 +6,7 @@ function passToWif(login, pass) {
 	}
 }
 
-function loadTransaction() {
+function loadTransaction(currentDate) {
 	if(transaction.from == undefined || transaction.escrow_id == undefined) {
 		return false;
 	}
@@ -93,7 +93,8 @@ function loadTransaction() {
 				transaction.escrow_id,
 				approve,
 				function(err, response) {
-					callback();
+					console.log(err, response);
+					//callback();
 				}
 		);
 	}
@@ -419,7 +420,7 @@ $(function() {
 		steem.api.getDynamicGlobalProperties(function(err, response) {
 			blockchainDatetime = new Date(response.time + 'Z');
 			$('span.transactionDateCurrent').html(response.time);
-			loadTransaction();
+			loadTransaction(blockchainDatetime);
 		});
 
 

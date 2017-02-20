@@ -26,7 +26,7 @@ if(blockchain) {
 } else {
 	var matches = transaction.id.match(/^([a-z0-9\.\-]+)-([\d]+)-([steem|golos]+)$/);
 	console.log(matches);
-	if (matches.length) {
+	if (matches && matches.length) {
 		transaction.from = matches[1];
 		transaction.escrow_id = parseInt(matches[2]);
 		if (matches[3] !== undefined) {
