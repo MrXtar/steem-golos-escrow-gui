@@ -27,7 +27,7 @@ if(blockchain) {
 	if (transaction.id.match(/^[a-z0-9\.\-]+-[\d]+-[steem|golos]+$/)) {
 		parts = transaction.id.split('-');
 		transaction.from = parts[0];
-		transaction.escrow_id = parts[1];
+		transaction.escrow_id = parseInt(parts[1]);
 		if (parts[2] !== undefined) {
 			if (parts[2] == 'steem') {
 				currentLanguage = 'en';

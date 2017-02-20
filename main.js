@@ -307,7 +307,7 @@ $(function() {
 	});
 	
 	$('#approveForm').submit(function(e) {
-		$(this).find('input[type=submit]').prop('disabled', true);
+		$(this).find('button').prop('disabled', true);
 		transaction.submitApprove(
 			$('#inputActionLogin').val(),
 			$('#inputActionPassword').val(),
@@ -320,7 +320,7 @@ $(function() {
 	});
 
 	$('#releaseForm, #cancelForm').submit(function(e) {
-		$(this).find('input[type=submit]').prop('disabled', true);
+		$(this).find('button').prop('disabled', true);
 		e.preventDefault();
 		transaction.submitRelease(
 			$('#inputActionLogin').val(),
@@ -333,7 +333,7 @@ $(function() {
 	});
 
 	$('#expiredForm').submit(function(e) {
-		$(this).find('input[type=submit]').prop('disabled', true);
+		$(this).find('button').prop('disabled', true);
 		e.preventDefault();
 		transaction.submitExpired(
 			$('#inputActionLogin').val(),
@@ -346,7 +346,7 @@ $(function() {
 	});
 
 	$('#startDisputForm').submit(function(e) {
-		$(this).find('input[type=submit]').prop('disabled', true);
+		$(this).find('button').prop('disabled', true);
 		e.preventDefault();
 		transaction.submitDispute(
 			$('#inputActionLogin').val(),
@@ -359,7 +359,7 @@ $(function() {
 	});
 
 	$('#escrowForm').submit(function() {	
-		$(this).find('input[type=submit]').prop('disabled', true);
+		$(this).find('button').prop('disabled', true);
 		transaction.submitEscrow(
 			$('#inputActionLogin').val(),
 			$('#inputActionPassword').val(),
@@ -402,7 +402,6 @@ $(function() {
 				if(val.body !== undefined) {
 					var matches = val.body.match(/^([0-9.]+) (.*)/);
 					if(matches) {
-						matches[1] = 0.001;
 						if (matches && matches.length == 3) {
 							$('#sendAgent').append('<option value="' + val.author + '" data-fee="' + parseFloat(matches[1]).toFixed(3) + '">' + val.author + ', ' + LNG.words.reputation[currentLanguage] + ' ' + (Math.max(Math.log10(Math.abs(parseInt(val.author_reputation))) - 9, 0) * (parseInt(val.author_reputation) > 0 ? 1 : -1) * 9 + 25).toFixed(1) + ', ' + LNG.words.fee[currentLanguage] + ' ' + parseFloat(matches[1]).toFixed(3) + ', ' + matches[2] + '</option>');
 						}
