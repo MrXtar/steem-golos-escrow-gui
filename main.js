@@ -1,3 +1,54 @@
+function gup( name ) {
+	name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+	var regexS = "[\\?&]" + name + "=([^&#]*)";
+	var regex = new RegExp(regexS);
+	var results = regex.exec(window.location.href);
+	if (results == null) {
+		results = localStorage.getItem(name);
+		if(results) {
+			return results;
+		} else {
+			return '';
+		}
+	} else {
+		if(name == 'lng' || name == 'blockchain') {
+			localStorage.setItem(name, results[1]);
+		}
+		return results[1];
+	}
+}
+
+var currentLanguage = gup('lng'),
+	currentBlockchain = gup('blockchain'),
+	transaction = {
+		id: gup('id')
+	},
+	matches = transaction.id.match(/^([a-z0-9\.\-]+)-([\d]+)-([steem|golos]+)$/);
+
+if (matches && matches.length) {
+	transaction.from = matches[1];
+	transaction.escrow_id = parseInt(matches[2]);
+	if (matches[3] !== undefined) {
+		if(BLOCKCHAINS[matches[3]] != undefined) {
+			currentBlockchain = matches[3];
+		}
+	}
+} else {
+	transaction.id = null;
+}
+
+if(LOCALIZATIONS[currentLanguage] == undefined) {
+	currentLanguage = 'en';
+}
+if(BLOCKCHAINS[currentBlockchain] == undefined) {
+	currentBlockchain = 'steem';
+}
+
+var LNG = LOCALIZATIONS[currentLanguage],
+		BLOCKCHAIN = BLOCKCHAINS[currentBlockchain];
+
+//console.log(BLOCKCHAIN);
+
 function passToWif(login, pass) {
 	if(pass.charAt(0) == '5' && pass.length == 51) {
 		return pass;
@@ -16,7 +67,25 @@ function loadTransaction(currentDate) {
 			function(err, response) {
 				if(!err && !response) {
 					$('#errorTransactionNotFound').slideDown();
-					$('#escrowData').slideUp();
+					$('#escrowData').fadeOut();
+					steem.api.getAccountHistory(
+							transaction.from,
+							-1,
+							200,
+							function(err, response) {
+								if(!err && response.length) {
+									response.reverse();
+									$.each(response, function(index, val) {
+										if(val[1]['op'][0].search('escrow') == 0) {
+											if(parseInt(val[1]['op'][1]['escrow_id']) == parseInt(transaction.escrow_id)) {
+												$('#errorTransactionNotFound').append('<p><b>' + val[1]['op'][0] + '</b>: ' + JSON.stringify(val[1]['op'][1]) + '</p>');
+											}
+										}
+									});
+									$('span.transactionMeta').html(terms.terms !== undefined ? terms.terms : JSON.stringify(terms));
+								}
+							}
+					);
 				} else if (typeof response == 'object') {
 					$.each(response, function(index, value) {
 						if(transaction[index] == undefined) {
@@ -24,7 +93,7 @@ function loadTransaction(currentDate) {
 						}
 					});
 
-					if(transaction.steem_balance == '0.000 ' + LNG.options.steem_simbol[currentLanguage]) {
+					if(transaction.steem_balance == '0.000 ' + BLOCKCHAIN.steem_simbol) {
 						transaction.money = transaction.sbd_balance;
 					} else {
 						transaction.money = transaction.steem_balance;
@@ -51,15 +120,15 @@ function loadTransaction(currentDate) {
 					}
 					//console.log(transaction);
 					$('span.transactionId').html('<a href="?id=' + transaction.id + '">' + transaction.id + '</a>');
-					$('span.transactionFrom').html('<a target="_blank" href="https://' + LNG.options.url[currentLanguage] + '/@' + transaction.from + '">@' + transaction.from + '</a>');
-					$('span.transactionTo').html('<a target="_blank" href="https://' + LNG.options.url[currentLanguage] + '/@' + transaction.to + '">@' + transaction.to + '</a>');
-					$('span.transactionAgent').html('<a target="_blank" href="https://' + LNG.options.url[currentLanguage] + '/@' + transaction.agent + '">@' + transaction.agent + '</a>');
+					$('span.transactionFrom').html('<a target="_blank" href="https://' + BLOCKCHAIN.url + '/@' + transaction.from + '">@' + transaction.from + '</a>');
+					$('span.transactionTo').html('<a target="_blank" href="https://' + BLOCKCHAIN.url + '/@' + transaction.to + '">@' + transaction.to + '</a>');
+					$('span.transactionAgent').html('<a target="_blank" href="https://' + BLOCKCHAIN.url + '/@' + transaction.agent + '">@' + transaction.agent + '</a>');
 					$('span.transactionMoney').html(transaction.money);
 					$('span.transactionFee').html(transaction.pending_fee);
 					$('span.transactionDate').html(transaction.escrow_expiration);
 					$('span.transactionDeadline').html(transaction.ratification_deadline);
 
-					var meta = '';
+					var terms = '';
 					steem.api.getAccountHistory(
 							transaction.from,
 							-1,
@@ -69,11 +138,11 @@ function loadTransaction(currentDate) {
 									$.each(response, function(index, val) {
 										if(val[1]['op'][0] == 'escrow_transfer') {
 											if(parseInt(val[1]['op'][1]['escrow_id']) == parseInt(transaction.escrow_id)) {
-												meta = $.parseJSON(val[1]['op'][1]['json_meta']);
+												terms = $.parseJSON(val[1]['op'][1]['json_meta']);
 											}
 										}
 									});
-									$('span.transactionMeta').html(meta.meta !== undefined ? meta.meta : JSON.stringify(meta));
+									$('span.transactionMeta').html(terms.terms !== undefined ? terms.terms : JSON.stringify(terms));
 								}
 							}
 					);
@@ -93,8 +162,8 @@ function loadTransaction(currentDate) {
 				transaction.escrow_id,
 				approve,
 				function(err, response) {
-					console.log(err, response);
-					//callback();
+					//console.log(err, response);
+					callback();
 				}
 		);
 	}
@@ -167,49 +236,67 @@ function loadTransaction(currentDate) {
 }
 
 $(function() {
+
+	steem.api.getConfig(function(err, response) {
+		console.log(err, response);
+	});
+
+	$('.switcher > a').click(function() {
+		$(this).next('ul').slideToggle('fast');
+	});
 	// Set language
+	$('#switchLanguage > a').text(LNG.name);
+	$.each(LOCALIZATIONS, function(index, val) {
+		$('#switchLanguage ul').append('<li><a href="?lng=' + index + '">' + val.name + '</a></li>');
+	});
+	$('#switchBlockchain > a').text(BLOCKCHAIN.steem_simbol);
+	$.each(BLOCKCHAINS, function(index, val) {
+		$('#switchBlockchain ul').append('<li><a href="?blockchain=' + index + '">' + val.steem_simbol + '</a></li>');
+	});
 	$.each(LNG.byElement, function(index, value) {
-		$(index).html(value[currentLanguage]);
+		$(index).html(value);
 	});
 	$.each(LNG.byId, function(index, value) {
 		var elById = $('#' + index);
 		if (typeof elById.attr('placeholder') !== typeof undefined && elById.attr('placeholder') !== false) {
-			elById.attr('placeholder', value[currentLanguage]);
+			elById.attr('placeholder', value);
 		} else {
-			elById.html(value[currentLanguage]);
+			elById.html(value);
 		}
 	});
 	$.each(LNG.byClass, function(index, value) {
-		$('.' + index).html(value[currentLanguage]);
+		$('.' + index).html(value);
 	});
+	$('.inputToggle').text(BLOCKCHAIN.steem_simbol);
+	$('#tabSend').append(' ' + BLOCKCHAIN.steem_simbol + '/' + BLOCKCHAIN.sbd_simbol);
 
 
 	$('a.inputToggle').click(function() {
-		if($(this).text() == LNG.options.steem_simbol[currentLanguage]) {
-			$('.inputToggle').text(LNG.options.sbd_simbol[currentLanguage]);
+		if($(this).text() == BLOCKCHAIN.steem_simbol) {
+			$('.inputToggle').text(BLOCKCHAIN.sbd_simbol);
 		} else {
-			$('.inputToggle').text(LNG.options.steem_simbol[currentLanguage]);
+			$('.inputToggle').text(BLOCKCHAIN.steem_simbol);
 		}
 		return false;
 	});
 
 	$('a#tabCP').click(function() {
 		if(!transaction.id) {
-			transaction.id = prompt(LNG.words.enterId[currentLanguage]);
+			transaction.id = prompt(LNG.words.enterId);
 			if(!transaction.id) {
 				return false;
 			}
 			window.location.href = '?id=' + transaction.id;
 		}
 		$(this).parent().addClass('active').siblings().removeClass('active');
-		$('#step1, #step2-' + currentLanguage).hide();
+		$('#step1, #step2').hide();
 		$('#controlPanel').show();
 		return false;
 	});
 
 	$('a#tabSend').click(function() {
 		$(this).parent().addClass('active').siblings().removeClass('active');
-		$('#step1').show();				
+		$('#step1').fadeIn('fast');
 		$('#controlPanel').hide();
 		return false;
 	});
@@ -223,10 +310,10 @@ $(function() {
 		agent = $('#sendAgent').val(),
 		escrow_id = parseInt(Math.random() * (99999999 - 10000000) + 10000000),
 		fee = parseFloat($('#sendAgent option:selected').data('fee')).toFixed(3) + ' ' + $('#aSendAmountUnit').text(),
-		sbd_amount = '0.000 ' + LNG.options.sbd_simbol[currentLanguage],
-		steem_amount = '0.000 ' + LNG.options.steem_simbol[currentLanguage],
-		meta = {
-			meta: $('#inputSendMeta').val()
+		sbd_amount = '0.000 ' + BLOCKCHAIN.sbd_simbol,
+		steem_amount = '0.000 ' + BLOCKCHAIN.steem_simbol,
+		terms = {
+			terms: $('#inputSendMeta').val()
 		};
 
 		if(!from || !to || !agent || !fee) {
@@ -235,10 +322,10 @@ $(function() {
 		
 		btn.prop('disabled', true);
 		
-		if($('#aSendAmountUnit').text() == LNG.options.steem_simbol[currentLanguage]) {
-			steem_amount = parseFloat($('#inputSendAmount').val().replace(',','.')).toFixed(3) + ' ' + LNG.options.steem_simbol[currentLanguage];
-		} else if ($('#aSendAmountUnit').text() == LNG.options.sbd_simbol[currentLanguage]) {
-			sbd_amount = parseFloat($('#inputSendAmount').val().replace(',','.')).toFixed(3) + ' ' + LNG.options.sbd_simbol[currentLanguage];
+		if($('#aSendAmountUnit').text() == BLOCKCHAIN.steem_simbol) {
+			steem_amount = parseFloat($('#inputSendAmount').val().replace(',','.')).toFixed(3) + ' ' + BLOCKCHAIN.steem_simbol;
+		} else if ($('#aSendAmountUnit').text() == BLOCKCHAIN.sbd_simbol) {
+			sbd_amount = parseFloat($('#inputSendAmount').val().replace(',','.')).toFixed(3) + ' ' + BLOCKCHAIN.sbd_simbol;
 		}
 
 		steem.api.getDynamicGlobalProperties(function(err, response) {
@@ -262,7 +349,7 @@ $(function() {
 				fee, // fee
 				ratification_deadline,
 				escrow_expiration,
-				JSON.stringify(meta),
+				JSON.stringify(terms),
 				function(err, response) {
 					if(!err && response.ref_block_num) {
 						if(from) {
@@ -270,11 +357,11 @@ $(function() {
 						}
 						$('#sendError').slideUp();
 						$('#step1').slideUp();
-						$('#step2-' + currentLanguage).slideDown();
-						$('.sentLink').html('<a href="?id=' + from + '-' + escrow_id + '-' + LNG.options.network[currentLanguage] + '">https://golosim.ru/escrow/?id=' + from + '-' + escrow_id + '-' + LNG.options.network[currentLanguage] + '</a>');
+						$('#step2').slideDown();
+						$('.sentLink').html('<a href="?id=' + from + '-' + escrow_id + '-' + BLOCKCHAIN.network + '">https://golosim.ru/escrow/?id=' + from + '-' + escrow_id + '-' + BLOCKCHAIN.network + '</a>');
 						$('.sentId').html(from + '-' + escrow_id);
 					} else {
-						$('#sendError').html('<br><b>Возникла ошибка:</b><br><br>');
+						$('#sendError').html(LNG.byId.sendError);
 						if(err.payload !== undefined) {
 							$('#sendError').append(err.payload.error.message.replace(/([^>])\n/g, '$1<br><br>'));
 						} else {
@@ -291,7 +378,14 @@ $(function() {
 		$('form').hide();
 		$('#' + $(this).data('form')).show();
 		$('#sendTransaction').hide();
-		$('#sendTransaction').slideDown();
+		$('#sendTransaction').slideDown('fast',function() {
+			//$('html, body').scrollTop( $(document).height() );
+
+			$('body').animate({
+				scrollTop: $(document).height()
+			}, 2000);
+
+		});
 		$('input[type=submit]').prop('disabled', false); // fix firefox page refresh
 		$('#inputActionLogin').val(transaction[$(this).data('nick')]);
 		$('#inputActionPassword').val('').focus();
@@ -385,12 +479,12 @@ $(function() {
 		} else {
 			$('#agentFeeWrap').slideUp();
 		}
-		$('#labelSendFeeAmout').html(LNG.byId.labelSendFeeAmout[currentLanguage] + ' <a href="https://' + LNG.options.url[currentLanguage] + '/@' + agent + '" target="_blank">@' + agent + '</a>');
+		$('#labelSendFeeAmout').html(LNG.byId.labelSendFeeAmout + ' <a href="https://' + BLOCKCHAIN.url + '/@' + agent + '" target="_blank">@' + agent + '</a>');
 		$('#sendFeeAmout').val($('#sendAgent option:selected').data('fee'));
 	});
 
 	// добавляем гарантов из блокчейна, сортируем по репутации
-	steem.api.getContentReplies(LNG.options.agents_list_post_author[currentLanguage], LNG.options.agents_list_post_permlink[currentLanguage], function(err, result) {
+	steem.api.getContentReplies(BLOCKCHAIN.agents_list_post_author, BLOCKCHAIN.agents_list_post_permlink, function(err, result) {
 		if(!err) {
 			result.sort(function(a, b) {
 				if (parseInt(a.author_reputation) < parseInt(b.author_reputation))
@@ -404,7 +498,7 @@ $(function() {
 					var matches = val.body.match(/^([0-9.]+) (.*)/);
 					if(matches) {
 						if (matches && matches.length == 3) {
-							$('#sendAgent').append('<option value="' + val.author + '" data-fee="' + parseFloat(matches[1]).toFixed(3) + '">' + val.author + ', ' + LNG.words.reputation[currentLanguage] + ' ' + (Math.max(Math.log10(Math.abs(parseInt(val.author_reputation))) - 9, 0) * (parseInt(val.author_reputation) > 0 ? 1 : -1) * 9 + 25).toFixed(1) + ', ' + LNG.words.fee[currentLanguage] + ' ' + parseFloat(matches[1]).toFixed(3) + ', ' + matches[2] + '</option>');
+							$('#sendAgent').append('<option value="' + val.author + '" data-fee="' + parseFloat(matches[1]).toFixed(3) + '">' + val.author + ', ' + LNG.words.reputation + ' ' + (Math.max(Math.log10(Math.abs(parseInt(val.author_reputation))) - 9, 0) * (parseInt(val.author_reputation) > 0 ? 1 : -1) * 9 + 25).toFixed(1) + ', ' + LNG.words.fee + ' ' + parseFloat(matches[1]).toFixed(3) + ', ' + matches[2] + '</option>');
 						}
 					}
 				}
@@ -415,9 +509,10 @@ $(function() {
 
 
 
-	if(transaction.id) {
+		if(transaction.id) {
 		$('#tabCP').click();
 		steem.api.getDynamicGlobalProperties(function(err, response) {
+			console.log(err, response);
 			blockchainDatetime = new Date(response.time + 'Z');
 			$('span.transactionDateCurrent').html(response.time);
 			loadTransaction(blockchainDatetime);

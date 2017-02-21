@@ -1,6 +1,7 @@
 body {
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 14px;
+	background-color: #f3f3f3;
 }
 .hidden {
 	display: none;
@@ -10,6 +11,34 @@ a {
 }
 .inputWithToggles {
 	position: relative;
+}
+.switcher {
+	position: relative;
+	height: 40px;
+}
+.switcher ul {
+	display: none;
+	list-style: none;
+	position: absolute;
+	top: 100%;
+	left: 0;
+	background-color: #23579d;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+}
+.switcher > a:after {
+	content: " \25be";
+}
+.switcher ul li {
+	display: block;
+	margin: 0;
+}
+.switcher ul li a {
+	display: block;
+	padding: 10px;
+	margin: 0;
+	text-align: center;
 }
 .inputWithToggles a.inputToggle {
 	color: #000;
@@ -123,14 +152,16 @@ ul#tabs {
 	padding:0;
 	margin: 0;
 }
-ul#tabs li:first-child {
+ul#tabs > li:first-child {
 	margin-left: -10px;
 }
 ul#tabs li.right {
 	float: right;
+}
+ul#tabs li.right.last {
 	margin-right: -10px;
 }
-ul#tabs li {
+ul#tabs > li {
 	float: left;
 }
 ul#tabs li a {
@@ -141,13 +172,36 @@ ul#tabs li a {
 	display: block;
 	height: 40px;
 }
-ul#tabs li.active a {
+ul#tabs li.active a,
+ul#tabs li a:hover {
 	opacity: 1;
 }
 #content {
 	margin-top: 60px;
 }
-
+#sendTransaction {
+	margin-bottom: 50px;
+}
+#footer {
+	font-size: 13px;
+	line-height: 17px;
+	padding: 6px 5px 5px;
+	background-color: #23579d;
+	color: #fff;
+	box-shadow: 0px -2px 4px #aaaaaa;
+	position: fixed;
+	top: auto;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+#footer a {
+	color: #fff;
+	opacity: 0.5;
+}
+#footer a:hover {
+	opacity: 1;
+}
 @media (max-width: 950px) {
 	.container {
 		width: 700px;
