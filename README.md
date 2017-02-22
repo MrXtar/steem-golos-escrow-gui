@@ -1,4 +1,4 @@
-# GOLOS and STEEM Escrow Transaction GUI
+# STEEM and GOLOS Escrow Transactions GUI
 GUI для отправки GOLOS/GBG и STEEM/SBD с гарантом
 
 Это обычная html страница, поэтому может работать даже локально. Скачайте себе содержимое данного репозитория и пользуйтесь, запустив файл **index.html**.
