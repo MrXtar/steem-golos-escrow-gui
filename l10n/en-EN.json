@@ -65,6 +65,7 @@
     "errorTransactionNotFound":"<strong>Error!</strong> No active order with this ID in the blockchain. Searching last transactions with this ID..."
   },
   "byClass":{
+    "inputToggle":"{steem_ticker}",
     "selectOption3hours":"3 hours",
     "selectOption6hours":"6 hours",
     "selectOption12hours":"12 hours",
