@@ -1,3 +1,4 @@
+// get params from url
 function gup( name ) {
 	name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 	var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -18,12 +19,37 @@ function gup( name ) {
 	}
 }
 
-var currentLanguage = gup('lng'),
-	currentBlockchain = gup('blockchain'),
+// Loading blockchain
+var BLOCKCHAINS = {
+	steem: {
+		network: 'steem',
+		websocket: 'wss://steemd.steemit.com',
+		address_prefix: 'STM',
+		chain_id: '0000000000000000000000000000000000000000000000000000000000000000',
+		steem_simbol: 'STEEM',
+		sbd_simbol: 'SBD',
+		url: 'steemit.com',
+		agents_list_post_author: 'xtar',
+		agents_list_post_permlink: 'escrow-agents-homepage'
+	},
+	golos: {
+		network: 'golos',
+		websocket: 'wss://ws.golos.io',
+		address_prefix: 'GLS',
+		chain_id: "782a3039b478c839e4cb0c941ff4eaeb7df40bdd68bd441afd444b9da763de12",
+		steem_simbol: 'GOLOS',
+		sbd_simbol: 'GBG',
+		url: 'golos.io',
+		agents_list_post_author: 'xtar',
+		agents_list_post_permlink: 'khochesh-stat-garantom-bud-im'
+	}},
+	BLOCKCHAIN,
 	transaction = {
 		id: gup('id')
 	},
-	matches = transaction.id.match(/^([a-z0-9\.\-]+)-([\d]+)-([steem|golos]+)$/);
+	matches = transaction.id.match(/^([a-z0-9\.\-]+)-([\d]+)-([steem|golos]+)$/),
+	currentBlockchain = gup('blockchain'),
+	LNG;
 
 if (matches && matches.length) {
 	transaction.from = matches[1];
@@ -36,18 +62,70 @@ if (matches && matches.length) {
 } else {
 	transaction.id = null;
 }
-
-if(LOCALIZATIONS[currentLanguage] == undefined) {
-	currentLanguage = 'en';
-}
-if(BLOCKCHAINS[currentBlockchain] == undefined) {
+if(!currentBlockchain) {
 	currentBlockchain = 'steem';
 }
+BLOCKCHAIN = BLOCKCHAINS[currentBlockchain];
 
-var LNG = LOCALIZATIONS[currentLanguage],
-		BLOCKCHAIN = BLOCKCHAINS[currentBlockchain];
+// need for replace {string} in localization
+String.prototype.replaceArray = function(find, replace) {
+	var replaceString = this,
+		find = [
+			'{steem_simbol}',
+			'{sbd_simbol}'
+		], replace = [
+			BLOCKCHAIN.steem_simbol,
+			BLOCKCHAIN.sbd_simbol
+		];
+	for (var i = 0; i < find.length; i++) {
+		replaceString = replaceString.replace(find[i], replace[i]);
+	}
+	return replaceString;
+};
 
-//console.log(BLOCKCHAIN);
+// load lng
+function changeLanguage(lng) {
+	$.ajax({
+		dataType: "json",
+		url: 'lng/' + lng + '.json',
+		success: function(r) {
+			console.log(r);
+			LNG = r;
+			$.each(LNG.byElement, function(index, value) {
+				$(index).html(value.replaceArray());
+			});
+			$.each(LNG.byId, function(index, value) {
+				var elById = $('#' + index);
+				if (typeof elById.attr('placeholder') !== typeof undefined && elById.attr('placeholder') !== false) {
+					elById.attr('placeholder', value.replaceArray());
+				} else {
+					elById.html(value.replaceArray());
+				}
+			});
+			$.each(LNG.byClass, function(index, value) {
+				$('.' + index).html(value.replaceArray());
+			});
+
+			if(transaction.id) {
+				$('#tabCP').click();
+				steem.api.getDynamicGlobalProperties(function(err, response) {
+					console.log(err, response);
+					blockchainDatetime = new Date(response.time + 'Z');
+					$('span.transactionDateCurrent').html(response.time);
+					loadTransaction(blockchainDatetime);
+				});
+			} else {
+				$('#tabSend').click();
+				if($('#inputSendLogin').val()) {
+					$('#inputSendPassword').focus();
+				} else {
+					$('#inputSendLogin').focus();
+				}
+			}
+
+		}
+	});
+}
 
 function passToWif(login, pass) {
 	if(pass.charAt(0) == '5' && pass.length == 51) {
@@ -244,31 +322,6 @@ $(function() {
 	$('.switcher > a').click(function() {
 		$(this).next('ul').slideToggle('fast');
 	});
-	// Set language
-	$('#switchLanguage > a').text(LNG.name);
-	$.each(LOCALIZATIONS, function(index, val) {
-		$('#switchLanguage ul').append('<li><a href="?lng=' + index + '">' + val.name + '</a></li>');
-	});
-	$('#switchBlockchain > a').text(BLOCKCHAIN.steem_simbol);
-	$.each(BLOCKCHAINS, function(index, val) {
-		$('#switchBlockchain ul').append('<li><a href="?blockchain=' + index + '">' + val.steem_simbol + '</a></li>');
-	});
-	$.each(LNG.byElement, function(index, value) {
-		$(index).html(value);
-	});
-	$.each(LNG.byId, function(index, value) {
-		var elById = $('#' + index);
-		if (typeof elById.attr('placeholder') !== typeof undefined && elById.attr('placeholder') !== false) {
-			elById.attr('placeholder', value);
-		} else {
-			elById.html(value);
-		}
-	});
-	$.each(LNG.byClass, function(index, value) {
-		$('.' + index).html(value);
-	});
-	$('.inputToggle').text(BLOCKCHAIN.steem_simbol);
-	$('#tabSend').append(' ' + BLOCKCHAIN.steem_simbol + '/' + BLOCKCHAIN.sbd_simbol);
 
 
 	$('a.inputToggle').click(function() {
@@ -290,13 +343,13 @@ $(function() {
 		}
 		$(this).parent().addClass('active').siblings().removeClass('active');
 		$('#step1, #step2').hide();
-		$('#controlPanel').show();
+		$('#controlPanel').fadeIn();
 		return false;
 	});
 
 	$('a#tabSend').click(function() {
 		$(this).parent().addClass('active').siblings().removeClass('active');
-		$('#step1').fadeIn('fast');
+		$('#step1').fadeIn();
 		$('#controlPanel').hide();
 		return false;
 	});
@@ -507,27 +560,10 @@ $(function() {
 		}
 	});
 
-
-
-		if(transaction.id) {
-		$('#tabCP').click();
-		steem.api.getDynamicGlobalProperties(function(err, response) {
-			console.log(err, response);
-			blockchainDatetime = new Date(response.time + 'Z');
-			$('span.transactionDateCurrent').html(response.time);
-			loadTransaction(blockchainDatetime);
-		});
-
-
-	} else {
-		
-		$('#tabSend').click();
-
-		if($('#inputSendLogin').val()) {
-			$('#inputSendPassword').focus();
-		} else {
-			$('#inputSendLogin').focus();
-		}
+	var currentLanguage = gup('lng');
+	if(!currentLanguage) {
+		currentLanguage = 'en';
 	}
-	
+	changeLanguage(currentLanguage);
+
 });

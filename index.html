@@ -4,17 +4,12 @@
 	<meta charset="utf-8">
 	<meta name=viewport content="width=device-width,initial-scale=1">
 	<title>Отправка GOLOS/GBG (с гарантом)</title>
-	<script type="text/javascript">
-		var LOCALIZATIONS = {};
-	</script>
-	<script src="lng/ru.js?21" type="text/javascript"></script>
-	<script src="lng/en.js?21" type="text/javascript"></script>
+	<script src="blockchains/golos.js?22" type="text/javascript"></script>
+	<script src="blockchains/steem.js?22" type="text/javascript"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-	<script src="blockchains/golos.js?21" type="text/javascript"></script>
-	<script src="blockchains/steem.js?21" type="text/javascript"></script>
-	<script src="main.js?21" type="text/javascript"></script>
-	<script src="steem.min.js?21"></script>
-	<link rel="stylesheet" href="main.css?21">
+	<script src="main.js?22" type="text/javascript"></script>
+	<script src="steem.min.js?22"></script>
+	<link rel="stylesheet" href="main.css?22">
 </head>
 
 <body>
@@ -26,14 +21,20 @@
 			<li><a id="tabCP" href="/">Панель управления транзакцией</a></li>
 			<li class="right last">
 				<div id="switchLanguage" class="switcher">
-					<a href="#">ru</a>
-					<ul></ul>
+					<a id="currentLanguage" href="#"></a>
+					<ul>
+						<li><a href="?lng=en">English</a></li>
+						<li><a href="?lng=ru">Русский</a></li>
+					</ul>
 				</div>
 			</li>
 			<li class="right">
 				<div id="switchBlockchain" class="switcher">
-					<a href="#">golos</a>
-					<ul></ul>
+					<a id="currentBlockchain" href="#"></a>
+					<ul>
+						<li><a href="?blockchain=steem">STEEM</a></li>
+						<li><a href="?blockchain=golos">GOLOS</a></li>
+					</ul>
 				</div>
 			</li>
 		</ul>
