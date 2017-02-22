@@ -65,7 +65,7 @@
     "errorTransactionNotFound":"<strong>Ошибка!</strong> Активный ордер с данным ID не найден в блокчейне. Поиск последних транзакций по данному ID..."
   },
   "byClass":{
-    "inputToggle":"",
+    "inputToggle":"{steem_ticker}",
     "selectOption3hours":"3 часа",
     "selectOption6hours":"6 часов",
     "selectOption12hours":"12 часов",
