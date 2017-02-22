@@ -26,8 +26,8 @@ var BLOCKCHAINS = {
 		websocket: 'wss://steemd.steemit.com',
 		address_prefix: 'STM',
 		chain_id: '0000000000000000000000000000000000000000000000000000000000000000',
-		steem_simbol: 'STEEM',
-		sbd_simbol: 'SBD',
+		steem_ticker: 'STEEM',
+		sbd_ticker: 'SBD',
 		url: 'steemit.com',
 		agents_list_post_author: 'xtar',
 		agents_list_post_permlink: 'escrow-agents-homepage'
@@ -37,8 +37,8 @@ var BLOCKCHAINS = {
 		websocket: 'wss://ws.golos.io',
 		address_prefix: 'GLS',
 		chain_id: "782a3039b478c839e4cb0c941ff4eaeb7df40bdd68bd441afd444b9da763de12",
-		steem_simbol: 'GOLOS',
-		sbd_simbol: 'GBG',
+		steem_ticker: 'GOLOS',
+		sbd_ticker: 'GBG',
 		url: 'golos.io',
 		agents_list_post_author: 'xtar',
 		agents_list_post_permlink: 'khochesh-stat-garantom-bud-im'
@@ -71,11 +71,11 @@ BLOCKCHAIN = BLOCKCHAINS[currentBlockchain];
 String.prototype.replaceArray = function(find, replace) {
 	var replaceString = this,
 		find = [
-			'{steem_simbol}',
-			'{sbd_simbol}'
+			'{steem_ticker}',
+			'{sbd_ticker}'
 		], replace = [
-			BLOCKCHAIN.steem_simbol,
-			BLOCKCHAIN.sbd_simbol
+			BLOCKCHAIN.steem_ticker,
+			BLOCKCHAIN.sbd_ticker
 		];
 	for (var i = 0; i < find.length; i++) {
 		replaceString = replaceString.replace(find[i], replace[i]);
@@ -171,7 +171,7 @@ function loadTransaction(currentDate) {
 						}
 					});
 
-					if(transaction.steem_balance == '0.000 ' + BLOCKCHAIN.steem_simbol) {
+					if(transaction.steem_balance == '0.000 ' + BLOCKCHAIN.steem_ticker) {
 						transaction.money = transaction.sbd_balance;
 					} else {
 						transaction.money = transaction.steem_balance;
@@ -325,10 +325,10 @@ $(function() {
 
 
 	$('a.inputToggle').click(function() {
-		if($(this).text() == BLOCKCHAIN.steem_simbol) {
-			$('.inputToggle').text(BLOCKCHAIN.sbd_simbol);
+		if($(this).text() == BLOCKCHAIN.steem_ticker) {
+			$('.inputToggle').text(BLOCKCHAIN.sbd_ticker);
 		} else {
-			$('.inputToggle').text(BLOCKCHAIN.steem_simbol);
+			$('.inputToggle').text(BLOCKCHAIN.steem_ticker);
 		}
 		return false;
 	});
@@ -363,8 +363,8 @@ $(function() {
 		agent = $('#sendAgent').val(),
 		escrow_id = parseInt(Math.random() * (99999999 - 10000000) + 10000000),
 		fee = parseFloat($('#sendAgent option:selected').data('fee')).toFixed(3) + ' ' + $('#aSendAmountUnit').text(),
-		sbd_amount = '0.000 ' + BLOCKCHAIN.sbd_simbol,
-		steem_amount = '0.000 ' + BLOCKCHAIN.steem_simbol,
+		sbd_amount = '0.000 ' + BLOCKCHAIN.sbd_ticker,
+		steem_amount = '0.000 ' + BLOCKCHAIN.steem_ticker,
 		terms = {
 			terms: $('#inputSendMeta').val()
 		};
@@ -375,10 +375,10 @@ $(function() {
 		
 		btn.prop('disabled', true);
 		
-		if($('#aSendAmountUnit').text() == BLOCKCHAIN.steem_simbol) {
-			steem_amount = parseFloat($('#inputSendAmount').val().replace(',','.')).toFixed(3) + ' ' + BLOCKCHAIN.steem_simbol;
-		} else if ($('#aSendAmountUnit').text() == BLOCKCHAIN.sbd_simbol) {
-			sbd_amount = parseFloat($('#inputSendAmount').val().replace(',','.')).toFixed(3) + ' ' + BLOCKCHAIN.sbd_simbol;
+		if($('#aSendAmountUnit').text() == BLOCKCHAIN.steem_ticker) {
+			steem_amount = parseFloat($('#inputSendAmount').val().replace(',','.')).toFixed(3) + ' ' + BLOCKCHAIN.steem_ticker;
+		} else if ($('#aSendAmountUnit').text() == BLOCKCHAIN.sbd_ticker) {
+			sbd_amount = parseFloat($('#inputSendAmount').val().replace(',','.')).toFixed(3) + ' ' + BLOCKCHAIN.sbd_ticker;
 		}
 
 		steem.api.getDynamicGlobalProperties(function(err, response) {
