@@ -87,7 +87,7 @@ String.prototype.replaceArray = function(find, replace) {
 function changeLanguage(lng) {
 	$.ajax({
 		dataType: "json",
-		url: '/l10n/' + lng + '.json',
+		url: 'l10n/' + lng + '.json',
 		success: function(r) {
 			console.log(r);
 			LNG = r;
