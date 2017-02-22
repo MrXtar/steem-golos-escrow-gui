@@ -12,7 +12,7 @@ function gup( name ) {
 			return '';
 		}
 	} else {
-		if(name == 'lng' || name == 'blockchain') {
+		if(name == 'l' || name == 'blockchain') {
 			localStorage.setItem(name, results[1]);
 		}
 		return results[1];
@@ -87,7 +87,7 @@ String.prototype.replaceArray = function(find, replace) {
 function changeLanguage(lng) {
 	$.ajax({
 		dataType: "json",
-		url: 'lng/' + lng + '.json',
+		url: '/l10n/' + lng + '.json',
 		success: function(r) {
 			console.log(r);
 			LNG = r;
@@ -560,9 +560,9 @@ $(function() {
 		}
 	});
 
-	var currentLanguage = gup('lng');
+	var currentLanguage = gup('l');
 	if(!currentLanguage) {
-		currentLanguage = 'en';
+		currentLanguage = 'en-EN';
 	}
 	changeLanguage(currentLanguage);
 

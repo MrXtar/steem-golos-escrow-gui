@@ -1,5 +1,6 @@
 {
   "name":"English",
+  "symbol":"en-EN",
   "words":{
     "fee":"fee",
     "reputation":"reputation",

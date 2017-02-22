@@ -1,5 +1,6 @@
 {
   "name":"Русский",
+  "symbol":"ru-RU",
   "words":{
     "fee":"комиссия",
     "reputation":"репутация",
