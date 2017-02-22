@@ -1,5 +1,3 @@
-var LOCALIZATIONS = {};
-
 LOCALIZATIONS.ru = {
     "name":"Русский",
     "words":{
