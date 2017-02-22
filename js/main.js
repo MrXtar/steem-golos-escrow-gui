@@ -321,6 +321,7 @@ $(function() {
 
 	$('.switcher > a').click(function() {
 		$(this).next('ul').slideToggle('fast');
+		return false;
 	});
 
 
