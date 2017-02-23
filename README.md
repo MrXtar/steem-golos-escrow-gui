@@ -11,5 +11,5 @@ You can read description of project with screenshots here:
 + [RU] on golos.io [Гаранты на блокчейне Голоса: GUI для отправки GOLOS/GBG](https://golos.io/ru--golos/@escrows/garanty-na-golose-gui-dlya-otpravki-golos-gbg-s-garantom).
 
 # Tech
-+ using steem.js v0.4.8 with small changes on [line 11193](https://github.com/MrXtar/steem-golos-escrow-gui/blob/master/js/steem.js#L11193) to support both blockchains (Steem and Golos).
++ using [steem.js v0.4.8](https://github.com/steemit/steem-js) with small changes on [line 11193](https://github.com/MrXtar/steem-golos-escrow-gui/blob/master/js/steem.js#L11193) to support both blockchains (Steem and Golos).
 + HTML + CSS + JQuery
