@@ -83,6 +83,27 @@ String.prototype.replaceArray = function(find, replace) {
 	return replaceString;
 };
 
+function showTab() {
+	$('#header ul li').show();
+	$('#currentBlockchain').text(BLOCKCHAIN.steem_ticker);
+	if(transaction.id) {
+		$('#tabCP').click();
+		steem.api.getDynamicGlobalProperties(function(err, response) {
+			console.log(err, response);
+			blockchainDatetime = new Date(response.time + 'Z');
+			$('span.transactionDateCurrent').html(response.time);
+			loadTransaction(blockchainDatetime);
+		});
+	} else {
+		$('#tabSend').click();
+		if($('#inputSendLogin').val()) {
+			$('#inputSendPassword').focus();
+		} else {
+			$('#inputSendLogin').focus();
+		}
+	}
+}
+
 // load lng
 function changeLanguage(lng) {
 	$.ajax({
@@ -106,23 +127,10 @@ function changeLanguage(lng) {
 				$('.' + index).html(value.replaceArray());
 			});
 
-			if(transaction.id) {
-				$('#tabCP').click();
-				steem.api.getDynamicGlobalProperties(function(err, response) {
-					console.log(err, response);
-					blockchainDatetime = new Date(response.time + 'Z');
-					$('span.transactionDateCurrent').html(response.time);
-					loadTransaction(blockchainDatetime);
-				});
-			} else {
-				$('#tabSend').click();
-				if($('#inputSendLogin').val()) {
-					$('#inputSendPassword').focus();
-				} else {
-					$('#inputSendLogin').focus();
-				}
-			}
-
+			showTab();
+		},
+		error: function() {
+			showTab();
 		}
 	});
 }
@@ -334,27 +342,27 @@ $(function() {
 		return false;
 	});
 
-	$('a#tabCP').click(function() {
-		if(!transaction.id) {
-			transaction.id = prompt(LNG.words.enterId);
-			if(!transaction.id) {
-				return false;
-			}
-			window.location.href = '?id=' + transaction.id;
+	$('ul#tabs li a').click(function() {
+		switch($(this).attr('id')) {
+			case 'tabCP':
+					try {
+						if (!transaction.id) {
+							transaction.id = prompt(LNG ? LNG.words.enterId : 'Enter ID');
+							if (!transaction.id) {
+								return false;
+							}
+							window.location.href = '?id=' + transaction.id;
+						}
+					} catch(e) {
+						console.log(e);
+					}
+				break;
 		}
 		$(this).parent().addClass('active').siblings().removeClass('active');
-		$('#step1, #step2').hide();
-		$('#controlPanel').fadeIn();
+		$('div.tabWrapper').hide();
+		$('div#' + $(this).attr('id') + 'Wrapper').fadeIn();
 		return false;
 	});
-
-	$('a#tabSend').click(function() {
-		$(this).parent().addClass('active').siblings().removeClass('active');
-		$('#step1').fadeIn();
-		$('#controlPanel').hide();
-		return false;
-	});
-
 
 	$('#buttonSendSubmit').click(function() {
 		var btn = $(this),

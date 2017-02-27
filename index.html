@@ -15,24 +15,26 @@
 <div id="header">
 	<div class="container">
 		<ul id="tabs">
-			<li><a id="tabSend" href="/"></a></li>
-			<li><a id="tabCP" href="/"></a></li>
-			<li class="right last">
-				<div id="switchLanguage" class="switcher">
-					<a id="currentLanguage" href="#"></a>
-					<ul>
-						<li><a href="?l=en-EN">English</a></li>
-						<li><a href="?l=ru-RU">Русский</a></li>
-						<li><a href="http://translate.golosim.ru/">Add lng</a></li>
-					</ul>
-				</div>
-			</li>
-			<li class="right">
+			<li>
 				<div id="switchBlockchain" class="switcher">
 					<a id="currentBlockchain" href="#"></a>
 					<ul>
 						<li><a href="?blockchain=steem">STEEM</a></li>
 						<li><a href="?blockchain=golos">GOLOS</a></li>
+					</ul>
+				</div>
+			</li>
+			<li><a id="tabBuy" href="/">Купить</a></li>
+			<li><a id="tabSell" href="/">Продать</a></li>
+			<li><a id="tabSend" href="/">Отправить</a></li>
+			<li><a id="tabCP" href="/">Панель управления</a></li>
+			<li class="right last">
+				<div id="switchLanguage" class="switcher">
+					<a id="currentLanguage" href="#">Русский</a>
+					<ul>
+						<li><a href="?l=en-EN">English</a></li>
+						<li><a href="?l=ru-RU">Русский</a></li>
+						<li><a href="http://translate.golosim.ru/">Add lng</a></li>
 					</ul>
 				</div>
 			</li>
@@ -42,7 +44,7 @@
 
 <div id="content" class="container">
 
-<div id="step1" style="display: none;">
+<div id="tabSendWrapper" class="tabWrapper" style="display: none;">
 
 <label id="labelLogin">Введите Ваши логин и пароль / Active WIF:</label>
 <div class="textGroup">
@@ -107,7 +109,7 @@
 
 <div id="step2" style="display: none;"></div>
 
-<div id="controlPanel" style="display: none;">
+<div id="tabCPWrapper" class="tabWrapper" style="display: none;">
 
 	<div id="errorTransactionNotFound" class="hidden">
 		<strong>Ошибка!</strong> Активный ордер с данным ID не найден в блокчейне.
