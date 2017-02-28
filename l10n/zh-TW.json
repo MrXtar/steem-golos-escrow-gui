@@ -3,6 +3,8 @@
   "symbol":"",
   "words":{
     "fee":"",
+    "hourShort":"",
+    "advertWillDisappear":"",
     "reputation":"",
     "enterId":""
   },
@@ -16,6 +18,7 @@
     "sendError":"",
     "tabSend":"",
     "tabCP":"",
+    "tabBoard":"",
     "labelLogin":"",
     "inputSendLogin":"",
     "inputSendPassword":"",
@@ -62,7 +65,9 @@
     "inputActionPassword":"",
     "actionApproveFormYes":"",
     "actionApproveFormNo":"",
-    "errorTransactionNotFound":""
+    "errorTransactionNotFound":"",
+    "boardAddAd":"",
+    "boardSidebarHelp":""
   },
   "byClass":{
     "inputToggle":"",
