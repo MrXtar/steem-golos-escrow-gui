@@ -646,7 +646,6 @@ $(function() {
 				changeLanguage();
 			}
 		});
-		changeLanguage(currentLanguage);
 		loadBoard();
 	});
 });
