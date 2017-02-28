@@ -130,7 +130,6 @@ function changeLanguage() {
 	$.each(LNG.byElement, function(index, value) {
 		$(index).html(value.replaceArray());
 	});
-	console.log(LNG.byId);
 	$.each(LNG.byId, function(index, value) {
 		var elById = $('#' + index);
 		if (typeof elById.attr('placeholder') !== typeof undefined && elById.attr('placeholder') !== false) {
@@ -215,7 +214,6 @@ function loadTransaction() {
 					if(!transaction.agent_approved) {
 						$('div.waitingForApprovalAgent').show();
 					}
-					//console.log(transaction);
 					$('span.transactionId').html('<a href="?id=' + transaction.id + '">' + transaction.id + '</a>');
 					$('span.transactionFrom').html('<a target="_blank" href="https://' + BLOCKCHAIN.url + '/@' + transaction.from + '">@' + transaction.from + '</a>');
 					$('span.transactionTo').html('<a target="_blank" href="https://' + BLOCKCHAIN.url + '/@' + transaction.to + '">@' + transaction.to + '</a>');
@@ -259,7 +257,6 @@ function loadTransaction() {
 				transaction.escrow_id,
 				approve,
 				function(err, response) {
-					//console.log(err, response);
 					callback();
 				}
 		);
@@ -347,7 +344,6 @@ function loadBoard() {
 				return 0;
 			});
 
-			console.log(result);
 			$.each(result, function(index, val) {
 				var lastUpdate = new Date(val.last_update + 'Z'),
 					between = Date.hoursBetween(lastUpdate, BLOCKCHAIN.time),
