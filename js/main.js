@@ -56,7 +56,8 @@ var BLOCKCHAINS = {
 		id: gup('id')
 	},
 	matches = transaction.id.match(/^([a-z0-9\.\-]+)-([\d]+)-([steem|golos]+)$/),
-	currentBlockchain = gup('blockchain');
+	currentBlockchain = gup('blockchain'),
+	currentTab = gup('tab');
 
 if (matches && matches.length) {
 	transaction.from = matches[1];
@@ -112,7 +113,8 @@ function showTab() {
 		$('#tabCP').click();
 		$('span.transactionDateCurrent').html(BLOCKCHAIN.timeString);
 		loadTransaction();
-
+	} else if (currentTab == 'board') {
+		$('#tabBoard').click();
 	} else {
 		$('#tabSend').click();
 		if($('#inputSendLogin').val()) {
@@ -176,7 +178,7 @@ function loadTransaction() {
 											}
 										}
 									});
-									$('span.transactionMeta').html(terms.terms !== undefined ? terms.terms : JSON.stringify(terms));
+									$('span.transactionMeta').html(terms !== undefined ? terms.terms : JSON.stringify(terms));
 								}
 							}
 					);
@@ -397,18 +399,22 @@ $(function() {
 
 	$('ul#tabs > li > a').click(function() {
 		switch($(this).attr('id')) {
+			case 'tabSend':
+				history.pushState('', LNG.byElement.title, '');
+				break;
 			case 'tabCP':
-					try {
-						if (!transaction.id) {
-							transaction.id = prompt(LNG.words.enterId);
-							if (!transaction.id) {
-								return false;
-							}
-							window.location.href = '?id=' + transaction.id;
-						}
-					} catch(e) {
-						console.log(e);
+				if (!transaction.id) {
+					transaction.id = prompt(LNG.words.enterId);
+					if (!transaction.id) {
+						return false;
 					}
+					window.location.href = '?id=' + transaction.id;
+				} else {
+					history.pushState('', LNG.byElement.title, '?id=' + transaction.id);
+				}
+				break;
+			case 'tabBoard':
+				history.pushState('', LNG.byId.tabBoard, '?tab=board');
 				break;
 		}
 		$(this).parent().addClass('active').siblings().removeClass('active');
