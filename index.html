@@ -5,9 +5,12 @@
 	<meta name=viewport content="width=device-width,initial-scale=1">
 	<title>Отправка GOLOS/GBG (с гарантом)</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-	<script src="js/main.js?24" type="text/javascript"></script>
-	<script src="js/steem.js?1"></script>
-	<link rel="stylesheet" href="css/main.css?10">
+	<script src="l10n/default.js?1" type="text/javascript"></script>
+	<script src="js/main.js?25" type="text/javascript"></script>
+	<script src="js/steem.js?2"></script>
+	<link rel="stylesheet" href="css/main.css?11">
+	<script type="text/javascript">
+	</script>
 </head>
 
 <body>
@@ -24,10 +27,9 @@
 					</ul>
 				</div>
 			</li>
-			<li><a id="tabBuy" href="/">Купить</a></li>
-			<li><a id="tabSell" href="/">Продать</a></li>
-			<li><a id="tabSend" href="/">Отправить</a></li>
-			<li><a id="tabCP" href="/">Панель управления</a></li>
+			<li><a id="tabSend" data-div="tabSendWrap" href="/">Отправить</a></li>
+			<li><a id="tabCP" data-div="controlPanelWrap" href="/">Панель управления</a></li>
+			<li><a id="tabBoard" data-div="tabBoardWrap" href="/">Объявле</a></li>
 			<li class="right last">
 				<div id="switchLanguage" class="switcher">
 					<a id="currentLanguage" href="#">Русский</a>
@@ -44,72 +46,84 @@
 
 <div id="content" class="container">
 
-<div id="tabSendWrapper" class="tabWrapper" style="display: none;">
-
-<label id="labelLogin">Введите Ваши логин и пароль / Active WIF:</label>
-<div class="textGroup">
-	<input id="inputSendLogin" class="form-control" type="text" placeholder="Ваш логин">
-	<input id="inputSendPassword" class="form-control" type="password" placeholder="Ваш пароль / Active WIF">
+<div id="tabBoardWrap" class="tabWrapper" style="display: none;">
+	<div id="boardSidebar">
+		<a id="boardAddAd" class="btn btn-block btn-primary" href="https://golos.io/nsfw/@xtar/test" target="_blank">Добавить объявление</a>
+		<div id="boardSidebarHelp">
+			<p>Показываются объявления не старше 3 дней.</p>
+			<p>У автора должна быть репутация не менее 50.</p>
+			<p>Сортировка по репутации авторов.</p>
+		</div>
+	</div>
+	<div id="boardBody"></div>
 </div>
 
+<div id="tabSendWrap" class="tabWrapper" style="display: none;">
 
-<label id="labelReceiver">Введите логин получателя платежа:</label>
-<input id="inputSendReceiver" class="form-control" type="text" placeholder="Логин получателя">
+<form id="formSend">
 
-<label id="labelAmount">Введите сумму для отправки:</label>
-<div class="inputWithToggles">
-	<input class="form-control" id="inputSendAmount" type="text" placeholder="Сумма, для переключения GOLOS/GBG кликни справа">
-	<a id="aSendAmountUnit" href="#" class="inputToggle"></a>
-</div><!-- /input-group -->
+	<label id="labelLogin">Введите Ваши логин и пароль / Active WIF:</label>
+	<div class="textGroup">
+		<input id="inputSendLogin" class="form-control" type="text" placeholder="Ваш логин">
+		<input id="inputSendPassword" class="form-control" type="password" placeholder="Ваш пароль / Active WIF">
+	</div>
 
-<label id="labelAgent"><span style="float: right;"></span>Выберите гаранта. Чтоб попасть в этот список, отписываемся <a href="https://golos.io/nsfw/@xtar/khochesh-stat-garantom-bud-im" target="_blank">вот тут</a>, сортировка списка по репутации гарантов:</label>
-<select id="sendAgent" class="form-control">
-	<option id="selectOptionChooseAgent" value="">Выберите гаранта...</option>
-</select>
 
-<div id="agentFeeWrap" style="display: none;">
-	<label id="labelSendFeeAmout">Комиссия:</label>
+	<label id="labelReceiver">Введите логин получателя платежа:</label>
+	<input id="inputSendReceiver" class="form-control" type="text" placeholder="Логин получателя">
+
+	<label id="labelAmount">Введите сумму для отправки:</label>
 	<div class="inputWithToggles">
-	<input class="form-control" disabled="disabled" id="sendFeeAmout" type="text">
-	<a href="#" class="inputToggle">GOLOS</a>
+		<input class="form-control" id="inputSendAmount" type="text" placeholder="Сумма, для переключения GOLOS/GBG кликни справа">
+		<a id="aSendAmountUnit" href="#" class="inputToggle"></a>
 	</div><!-- /input-group -->
+
+	<label id="labelAgent"><span style="float: right;"></span>Выберите гаранта. Чтоб попасть в этот список, отписываемся <a href="https://golos.io/nsfw/@xtar/khochesh-stat-garantom-bud-im" target="_blank">вот тут</a>, сортировка списка по репутации гарантов:</label>
+	<select id="sendAgent" class="form-control">
+		<option id="selectOptionChooseAgent" value="">Выберите гаранта...</option>
+	</select>
+
+	<div id="agentFeeWrap" style="display: none;">
+		<label id="labelSendFeeAmout">Комиссия:</label>
+		<div class="inputWithToggles">
+		<input class="form-control" disabled="disabled" id="sendFeeAmout" type="text">
+		<a href="#" class="inputToggle">GOLOS</a>
+		</div><!-- /input-group -->
+	</div>
+
+	<label id="labelDeadline">Укажите срок, втечение которого получатель и гарант должны дать свое согласие на совершение данной сделки. Если они не успеют этого сделать, средства автоматически вернутся на счет отправителя:</label>
+	<select id="sendDeadline" class="form-control">
+		<option class="selectOption3hours" value="3" selected="selected">3 часа</option>
+		<option class="selectOption6hours" value="6">6 часов</option>
+		<option class="selectOption12hours" value="12">12 часов</option>
+		<option class="selectOption24hours" value="24">24 часа</option>
+		<option class="selectOption2days" value="48">2 дня</option>
+		<option class="selectOption4days" value="96">4 дня</option>
+		<option class="selectOption1week" value="168">1 неделя</option>
+	</select>
+
+	<label id="labelEscrowEndDate">Укажите срок действия гаранта, по истечении которого любая из сторон сможет принять любое решение (либо забрать деньги себе, либо отправить второй стороне). Этот срок не может быть меньше предыдущего:</label>
+	<select id="sendEscrowExpiration" class="form-control">
+		<option class="selectOption1week" value="168">1 неделя</option>
+		<option class="selectOption2week" value="336">2 недели</option>
+		<option class="selectOption3week" value="504">3 недели</option>
+		<option class="selectOption1month" value="730" selected="selected">1 месяц</option>
+		<option class="selectOption2month" value="1460">2 месяц</option>
+		<option class="selectOption6month" value="4380">6 месяцев</option>
+		<option class="selectOption1year" value="8760">1 год</option>
+	</select>
+
+	<label id="labelTransactionTerms">Условия сделки (не обязательно, но крайне желательно)</label>
+	<input class="form-control" id="inputSendMeta" type="text" placeholder="Будут нужны в случае возникновения спорной ситуации">
+
+	<button form="formSend" id="buttonSendSubmit" class="btn btn-block btn-primary buttonSendSubmit">Отправить</button>
+
+</form>
+
+	<div id="sendError" style="display: none;"></div>
+	<div id="step2" style="display: none;">Sent ok: <a href="#" class="sentLink"></a></div>
 </div>
-
-<label id="labelDeadline">Укажите срок, втечение которого получатель и гарант должны дать свое согласие на совершение данной сделки. Если они не успеют этого сделать, средства автоматически вернутся на счет отправителя:</label>
-<select id="sendDeadline" class="form-control">
-	<option class="selectOption3hours" value="3" selected="selected">3 часа</option>
-	<option class="selectOption6hours" value="6">6 часов</option>
-	<option class="selectOption12hours" value="12">12 часов</option>
-	<option class="selectOption24hours" value="24">24 часа</option>
-	<option class="selectOption2days" value="48">2 дня</option>
-	<option class="selectOption4days" value="96">4 дня</option>
-	<option class="selectOption1week" value="168">1 неделя</option>
-</select>
-
-<label id="labelEscrowEndDate">Укажите срок действия гаранта, по истечении которого любая из сторон сможет принять любое решение (либо забрать деньги себе, либо отправить второй стороне). Этот срок не может быть меньше предыдущего:</label>
-<select id="sendEscrowExpiration" class="form-control">
-	<option class="selectOption1week" value="168">1 неделя</option>
-	<option class="selectOption2week" value="336">2 недели</option>
-	<option class="selectOption3week" value="504">3 недели</option>
-	<option class="selectOption1month" value="730" selected="selected">1 месяц</option>
-	<option class="selectOption2month" value="1460">2 месяц</option>
-	<option class="selectOption6month" value="4380">6 месяцев</option>
-	<option class="selectOption1year" value="8760">1 год</option>
-</select>
-
-<label id="labelTransactionTerms">Условия сделки (не обязательно, но крайне желательно)</label>
-<input class="form-control" id="inputSendMeta" type="text" placeholder="Будут нужны в случае возникновения спорной ситуации">
-
-
-<button id="buttonSendSubmit" class="btn btn-block btn-primary buttonSendSubmit">Отправить</button>
-
-</div>
-
-<div id="sendError" style="display: none;"></div>
-
-<div id="step2" style="display: none;"></div>
-
-<div id="tabCPWrapper" class="tabWrapper" style="display: none;">
+<div id="controlPanelWrap" class="tabWrapper" style="display: none;">
 
 	<div id="errorTransactionNotFound" class="hidden">
 		<strong>Ошибка!</strong> Активный ордер с данным ID не найден в блокчейне.
@@ -222,23 +236,9 @@
 			<td><span class="transactionMeta wordLoading">Загрузка...</span></td>
 		</tr>
 	</table>
-</div>
 
-<style type="text/css">
-	form {
-		display: none;
-	}
-	td:first-child {
-		white-space: nowrap;
-		font-weight: bold;
-	}
-	td:last-child {
-		text-align: right;
-	}
-</style>
+	<div id="sendTransaction" style="display: none;">
 
-<div id="sendTransaction" style="display: none;">	
-		
 		<label id="labelAction">Действие</label>
 		<select disabled="disabled" class="form-control" id="transactionType">
 			<option id="actionApproveForm" value="approveForm">Дать согласие (или отказ) на условия сделки</option>
@@ -248,14 +248,14 @@
 			<option id="actionEscrowForm" value="escrowForm">Гарант решит, кому отправить средства</option>
 			<option id="actionExpiredForm" value="expiredForm">Срок действия гаранта истек, забираю средства себе</option>
 		</select>
-		
+
 		<label id="actionLoginPassword">Введите Ваши логин и пароль / Active WIF</label>
 		<div class="textGroup">
 			<input disabled="disabled" id="inputActionLogin" class="form-control" type="text" placeholder="Ваш логин">
 			<input id="inputActionPassword" class="form-control" type="password" placeholder="Ваш пароль / Active WIF">
 		</div>
-		
-		<form id="approveForm" style="display: block;">			
+
+		<form id="approveForm" style="display: block;">
 			<label>
 				<input id="approveYes" name="yesNo" type="radio" value="1"> <span id="actionApproveFormYes">Да, с условиями согласен, продолжить сделку</span>
 			</label>
@@ -268,7 +268,7 @@
 		<form id="releaseForm">
 			<button form="releaseForm" class="btn btn-block btn-primary buttonSendFundsToReceiver">Отправить средства получателю</button>
 		</form>
-		
+
 		<form id="expiredForm">
 			<button form="expiredForm" class="btn btn-block btn-primary buttonTakeFunds">Забрать средства себе</button>
 		</form>
@@ -276,12 +276,12 @@
 		<form id="cancelForm">
 			<button form="cancelForm" class="btn btn-block btn-primary buttonSendFundsToSender">Отправить средства отправителю</button>
 		</form>
-		
+
 		<form id="startDisputForm">
 			<button form="startDisputForm" class="btn btn-block btn-primary buttonStartDispute">Оспорить сделку</button>
 		</form>
 
-		<form id="escrowForm">			
+		<form id="escrowForm">
 			<div class="radio">
 				<label>
 					<input id="escrowFrom" name="escrowAnswer" type="radio" value="escrowFrom"> <span class="buttonSendFundsToSender">Вернуть средства отправителю</span>
@@ -295,11 +295,12 @@
 			<button form="escrowForm" class="btn btn-block btn-primary buttonSendSubmit">Отправить</button>
 		</form>
 
-		
-		</div>
 
-
+	</div>
 </div>
+
+
+
 
 </div>
 

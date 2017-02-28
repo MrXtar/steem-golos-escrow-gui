@@ -19,6 +19,10 @@ function gup( name ) {
 	}
 }
 
+function calcRep(rep) {
+	return (Math.max(Math.log10(Math.abs(parseInt(rep))) - 9, 0) * (parseInt(rep) > 0 ? 1 : -1) * 9 + 25).toFixed(1);
+}
+
 // Loading blockchain
 var BLOCKCHAINS = {
 	steem: {
@@ -30,7 +34,9 @@ var BLOCKCHAINS = {
 		sbd_ticker: 'SBD',
 		url: 'steemit.com',
 		agents_list_post_author: 'xtar',
-		agents_list_post_permlink: 'escrow-agents-homepage'
+		agents_list_post_permlink: 'escrow-agents-homepage',
+		board_post_author: 'xtar',
+		board_post_permlink: 'board'
 	},
 	golos: {
 		network: 'golos',
@@ -41,15 +47,16 @@ var BLOCKCHAINS = {
 		sbd_ticker: 'GBG',
 		url: 'golos.io',
 		agents_list_post_author: 'xtar',
-		agents_list_post_permlink: 'khochesh-stat-garantom-bud-im'
+		agents_list_post_permlink: 'khochesh-stat-garantom-bud-im',
+		board_post_author: 'xtar',
+		board_post_permlink: 'test'
 	}},
 	BLOCKCHAIN,
 	transaction = {
 		id: gup('id')
 	},
 	matches = transaction.id.match(/^([a-z0-9\.\-]+)-([\d]+)-([steem|golos]+)$/),
-	currentBlockchain = gup('blockchain'),
-	LNG;
+	currentBlockchain = gup('blockchain');
 
 if (matches && matches.length) {
 	transaction.from = matches[1];
@@ -83,17 +90,29 @@ String.prototype.replaceArray = function(find, replace) {
 	return replaceString;
 };
 
+Date.hoursBetween = function( date1, date2 ) {
+	//Get 1 day in milliseconds
+	var one_hour=1000*60*60;
+
+	// Convert both dates to milliseconds
+	var date1_ms = date1.getTime();
+	var date2_ms = date2.getTime();
+
+	// Calculate the difference in milliseconds
+	var difference_ms = date2_ms - date1_ms;
+
+	// Convert back to days and return
+	return Math.round(difference_ms/one_hour);
+};
+
 function showTab() {
 	$('#header ul li').show();
 	$('#currentBlockchain').text(BLOCKCHAIN.steem_ticker);
 	if(transaction.id) {
 		$('#tabCP').click();
-		steem.api.getDynamicGlobalProperties(function(err, response) {
-			console.log(err, response);
-			blockchainDatetime = new Date(response.time + 'Z');
-			$('span.transactionDateCurrent').html(response.time);
-			loadTransaction(blockchainDatetime);
-		});
+		$('span.transactionDateCurrent').html(BLOCKCHAIN.timeString);
+		loadTransaction();
+
 	} else {
 		$('#tabSend').click();
 		if($('#inputSendLogin').val()) {
@@ -105,34 +124,23 @@ function showTab() {
 }
 
 // load lng
-function changeLanguage(lng) {
-	$.ajax({
-		dataType: "json",
-		url: 'l10n/' + lng + '.json',
-		success: function(r) {
-			console.log(r);
-			LNG = r;
-			$.each(LNG.byElement, function(index, value) {
-				$(index).html(value.replaceArray());
-			});
-			$.each(LNG.byId, function(index, value) {
-				var elById = $('#' + index);
-				if (typeof elById.attr('placeholder') !== typeof undefined && elById.attr('placeholder') !== false) {
-					elById.attr('placeholder', value.replaceArray());
-				} else {
-					elById.html(value.replaceArray());
-				}
-			});
-			$.each(LNG.byClass, function(index, value) {
-				$('.' + index).html(value.replaceArray());
-			});
-
-			showTab();
-		},
-		error: function() {
-			showTab();
+function changeLanguage() {
+	$.each(LNG.byElement, function(index, value) {
+		$(index).html(value.replaceArray());
+	});
+	console.log(LNG.byId);
+	$.each(LNG.byId, function(index, value) {
+		var elById = $('#' + index);
+		if (typeof elById.attr('placeholder') !== typeof undefined && elById.attr('placeholder') !== false) {
+			elById.attr('placeholder', value.replaceArray());
+		} else {
+			elById.html(value.replaceArray());
 		}
 	});
+	$.each(LNG.byClass, function(index, value) {
+		$('.' + index).html(value.replaceArray());
+	});
+	showTab();
 }
 
 function passToWif(login, pass) {
@@ -143,7 +151,7 @@ function passToWif(login, pass) {
 	}
 }
 
-function loadTransaction(currentDate) {
+function loadTransaction() {
 	if(transaction.from == undefined || transaction.escrow_id == undefined) {
 		return false;
 	}
@@ -185,13 +193,13 @@ function loadTransaction(currentDate) {
 						transaction.money = transaction.steem_balance;
 					}
 
-					var transactionDateExpire = new Date(transaction.escrow_expiration);
+					var transactionDateExpire = new Date(transaction.escrow_expiration + 'Z');
 
 					if(!transaction.agent_approved || !transaction.to_approved) {
 						transaction.status = 'waitingForApproval';
 					} else if (transaction.disputed) {
 						transaction.status = 'disputeInitiated';
-					} else if (transactionDateExpire < currentDate) {
+					} else if (transactionDateExpire < BLOCKCHAIN.time) {
 						transaction.status = 'escrowExpired';
 					} else {
 						transaction.status = 'approvalRecieved';
@@ -321,17 +329,62 @@ function loadTransaction(currentDate) {
 
 }
 
-$(function() {
+function loadBoard() {
+	steem.api.getContentReplies(BLOCKCHAIN.board_post_author, BLOCKCHAIN.board_post_permlink, function(err, result) {
+		var orders = [],
+			wrap = $('#boardBody'),
+			messagesCount = 0,
+			hrSkip = true;
+		if(!err) {
+			result.sort(function(a, b) {
+				if (parseInt(a.author_reputation) < parseInt(b.author_reputation))
+					return 1;
+				if (parseInt(a.author_reputation) > parseInt(b.author_reputation))
+					return -1;
+				return 0;
+			});
 
-	steem.api.getConfig(function(err, response) {
-		console.log(err, response);
+			console.log(result);
+			$.each(result, function(index, val) {
+				var lastUpdate = new Date(val.last_update + 'Z'),
+					between = Date.hoursBetween(lastUpdate, BLOCKCHAIN.time),
+					author_rep = calcRep(val.author_reputation),
+					lines = val.body.split('\n'),
+					html = '';
+
+				if(between <= 72 && author_rep >= 50) { // only 7 days old ads and reputation >= 50
+					if(!hrSkip) {
+						wrap.append('<hr>');
+					}
+					hrSkip = false;
+					html += '<p class="boardMessageInfo"><a href="https://' + BLOCKCHAIN.url + '/@' +  val.author + '" target="_blank">@' + val.author + '</a>, ' + LNG.words.reputation + ' ' + author_rep + ', ' + LNG.words.advertWillDisappear + ' ' + (72 - between) + LNG.words.hourShort + '</a></p>';
+					for (var i = 0; i < lines.length; i++) {
+						if (i == 0) {
+							html += '<h2><a href="https://' + BLOCKCHAIN.url + val.url + '" target="_blank">' + lines[i] + '</a></h2>';
+						} else {
+							html += '<p>';
+							html += lines[i] + '</p>';
+						}
+					}
+
+					$('<div/>', {
+						class: 'order',
+						html: html
+					}).appendTo(wrap);
+					messagesCount++;
+				}
+			});
+			$('#tabBoard').append(' <span>' + messagesCount + '</span>');
+		}
 	});
+}
+
+$(function() {
 
 	$('.switcher > a').click(function() {
 		$(this).next('ul').slideToggle('fast');
 		return false;
 	});
-
 
 	$('a.inputToggle').click(function() {
 		if($(this).text() == BLOCKCHAIN.steem_ticker) {
@@ -342,12 +395,12 @@ $(function() {
 		return false;
 	});
 
-	$('ul#tabs li a').click(function() {
+	$('ul#tabs > li > a').click(function() {
 		switch($(this).attr('id')) {
 			case 'tabCP':
 					try {
 						if (!transaction.id) {
-							transaction.id = prompt(LNG ? LNG.words.enterId : 'Enter ID');
+							transaction.id = prompt(LNG.words.enterId);
 							if (!transaction.id) {
 								return false;
 							}
@@ -360,11 +413,11 @@ $(function() {
 		}
 		$(this).parent().addClass('active').siblings().removeClass('active');
 		$('div.tabWrapper').hide();
-		$('div#' + $(this).attr('id') + 'Wrapper').fadeIn();
+		$('div#' + $(this).data('div')).fadeIn();
 		return false;
 	});
 
-	$('#buttonSendSubmit').click(function() {
+	$('form#formSend').submit(function() {
 		var btn = $(this),
 		from = $('#inputSendLogin').val(),
 		to = $('#inputSendReceiver').val(),
@@ -417,8 +470,9 @@ $(function() {
 						if(from) {
 							localStorage.setItem('escrow_login', from);
 						}
+						$('form#formSend').slideUp();
 						$('#sendError').slideUp();
-						$('#step1').slideUp();
+						$('#formSend').slideUp();
 						$('#step2').slideDown();
 						$('.sentLink').html('<a href="?id=' + from + '-' + escrow_id + '-' + BLOCKCHAIN.network + '">https://golosim.ru/escrow/?id=' + from + '-' + escrow_id + '-' + BLOCKCHAIN.network + '</a>');
 						$('.sentId').html(from + '-' + escrow_id);
@@ -434,7 +488,9 @@ $(function() {
 				}
 			);
 		});
+		return false;
 	});
+
 	$('#escrowData').on('click', 'button', function() {
 		$('#transactionType').val($(this).data('form'));
 		$('form').hide();
@@ -560,7 +616,7 @@ $(function() {
 					var matches = val.body.match(/^([0-9.]+) (.*)/);
 					if(matches) {
 						if (matches && matches.length == 3) {
-							$('#sendAgent').append('<option value="' + val.author + '" data-fee="' + parseFloat(matches[1]).toFixed(3) + '">' + val.author + ', ' + LNG.words.reputation + ' ' + (Math.max(Math.log10(Math.abs(parseInt(val.author_reputation))) - 9, 0) * (parseInt(val.author_reputation) > 0 ? 1 : -1) * 9 + 25).toFixed(1) + ', ' + LNG.words.fee + ' ' + parseFloat(matches[1]).toFixed(3) + ', ' + matches[2] + '</option>');
+							$('#sendAgent').append('<option value="' + val.author + '" data-fee="' + parseFloat(matches[1]).toFixed(3) + '">' + val.author + ', ' + LNG.words.reputation + ' ' + calcRep(val.author_reputation) + ', ' + LNG.words.fee + ' ' + parseFloat(matches[1]).toFixed(3) + ', ' + matches[2] + '</option>');
 						}
 					}
 				}
@@ -573,6 +629,21 @@ $(function() {
 	if(!currentLanguage) {
 		currentLanguage = 'en-EN';
 	}
-	changeLanguage(currentLanguage);
-
+	steem.api.getDynamicGlobalProperties(function(err, response) {
+		BLOCKCHAIN.time = new Date(response.time + 'Z');
+		BLOCKCHAIN.timeString = response.time;
+		$.ajax({
+			dataType: "json",
+			url: 'l10n/' + currentLanguage + '.json',
+			success: function(r) {
+				LNG = r;
+				changeLanguage();
+			},
+			error: function() {
+				changeLanguage();
+			}
+		});
+		changeLanguage(currentLanguage);
+		loadBoard();
+	});
 });

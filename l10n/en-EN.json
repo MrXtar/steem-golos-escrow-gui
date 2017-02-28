@@ -3,6 +3,8 @@
   "symbol":"en-EN",
   "words":{
     "fee":"fee",
+    "hourShort":"h",
+    "advertWillDisappear":"will disappear after",
     "reputation":"reputation",
     "enterId":"Enter transaction ID, for example xtar-8724723-steem:"
   },
@@ -16,6 +18,7 @@
     "sendError":"<p><b>An error occurred:</b></p>",
     "tabSend":"Send {steem_ticker}/{sbd_ticker}",
     "tabCP":"Control Panel",
+    "tabBoard":"Board",
     "labelLogin":"Your login and password / Active WIF:",
     "inputSendLogin":"Your login",
     "inputSendPassword":"Your password / Active WIF",
@@ -62,7 +65,9 @@
     "inputActionPassword":"Your password / Active WIF",
     "actionApproveFormYes":"Yes, approve transaction",
     "actionApproveFormNo":"No, disapprove and cancel transaction",
-    "errorTransactionNotFound":"<strong>Error!</strong> No active order with this ID in the blockchain. Searching last transactions with this ID..."
+    "errorTransactionNotFound":"<strong>Error!</strong> No active order with this ID in the blockchain. Searching last transactions with this ID:",
+    "boardAddAd": "New message",
+    "boardSidebarHelp":"<p>Show notification for comments made within last 3 days (72 hours).</p><p>Minimum user reputation is 50.</p><p>Sorted by reputation.</p>"
   },
   "byClass":{
     "inputToggle":"{steem_ticker}",
