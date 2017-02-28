@@ -49,7 +49,7 @@ var BLOCKCHAINS = {
 		agents_list_post_author: 'xtar',
 		agents_list_post_permlink: 'khochesh-stat-garantom-bud-im',
 		board_post_author: 'xtar',
-		board_post_permlink: 'test'
+		board_post_permlink: 'board'
 	}},
 	BLOCKCHAIN,
 	transaction = {
@@ -142,6 +142,7 @@ function changeLanguage() {
 	$.each(LNG.byClass, function(index, value) {
 		$('.' + index).html(value.replaceArray());
 	});
+	$('#boardAddAd').attr('href','https://' + BLOCKCHAIN.url + '/board/@' + BLOCKCHAIN.board_post_author + '/' + BLOCKCHAIN.board_post_permlink);
 	showTab();
 }
 
@@ -354,7 +355,7 @@ function loadBoard() {
 					lines = val.body.split('\n'),
 					html = '';
 
-				if(between <= 72 && author_rep >= 50) { // only 7 days old ads and reputation >= 50
+				if(between <= 72 && author_rep >= 50 && lines.length > 1) { // only 7 days old ads and reputation >= 50
 					if(!hrSkip) {
 						wrap.append('<hr>');
 					}
