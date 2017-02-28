@@ -415,7 +415,7 @@ $(function() {
 				}
 				break;
 			case 'tabBoard':
-				history.pushState('', LNG.byId.tabBoard, '?tab=board');
+				history.pushState('', LNG.byId.tabBoard, '?tab=board&blockchain=' + BLOCKCHAIN.network);
 				break;
 		}
 		$(this).parent().addClass('active').siblings().removeClass('active');
