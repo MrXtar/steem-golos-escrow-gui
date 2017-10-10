@@ -82,15 +82,15 @@
     "selectOption3week":"3 semanas",
     "selectOption1month":"1 mes",
     "selectOption2month":"2 meses",
-    "selectOption6month":"",
-    "selectOption1year":"",
-    "wordLoading":"",
-    "buttonStartDispute":"",
-    "buttonSendFundsToReceiver":"",
-    "buttonTakeFunds":"",
-    "buttonDisapproveDeal":"",
-    "buttonApproveDeal":"",
-    "buttonSendFundsToSender":"",
-    "buttonSendSubmit":""
+    "selectOption6month":"6 meses",
+    "selectOption1year":"1 año",
+    "wordLoading":"Cargando...",
+    "buttonStartDispute":"Iniciar disputa",
+    "buttonSendFundsToReceiver":"Enviar fondos al receptor",
+    "buttonTakeFunds":"Tomar los fondos para mí",
+    "buttonDisapproveDeal":"No, desaprobar y cancelar la transacción",
+    "buttonApproveDeal":"Aprobar trato",
+    "buttonSendFundsToSender":"Enviar fondos de regreso al remitente",
+    "buttonSendSubmit":"Enviar"
   }
 }
