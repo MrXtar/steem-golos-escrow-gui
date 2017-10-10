@@ -54,7 +54,7 @@
     "agentApprovalRecieved":"",
     "agentEscrowExpired":"",
     "labelAction":"",
-    "actionApproveForm":"",
+    "actionApproveForm":"Aprobar o desaprobar la transacción",
     "actionReleaseForm":"",
     "actionCancelForm":"",
     "actionStartDisputeForm":"",
