@@ -27,7 +27,7 @@ function calcRep(rep) {
 var BLOCKCHAINS = {
 	steem: {
 		network: 'steem',
-		websocket: 'wss://steemd.steemit.com',
+		websocket: 'wss://steemd.steemitstage.com',
 		address_prefix: 'STM',
 		chain_id: '0000000000000000000000000000000000000000000000000000000000000000',
 		steem_ticker: 'STEEM',
